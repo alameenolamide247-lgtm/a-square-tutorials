@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#073b91">
+  <meta name="description" content="A² Tutorials - Excellence in Learning, Success in Results. Prepare for UTME with confidence.">
+  <title>A² Tutorials | Excellence in Learning</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #0755c9;
+      --dark: #08275b;
+      --cyan: #12c5ed;
+      --light: #f2f8ff;
+      --white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--dark);
+      background: var(--white);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 7%;
+      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 3px 20px #08275b0c;
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 27px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .logo span {
+      color: var(--cyan);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-links a:hover {
+      color: var(--blue);
+    }
+
+    .nav-button {
+      background: var(--blue);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 7px;
+    }
+
+    .hero {
+      min-height: 590px;
+      padding: 100px 8%;
+      display: flex;
+      align-items: center;
+      background:
+        radial-gradient(circle at 90% 15%, #12c5ed55, transparent 30%),
+        linear-gradient(120deg, #062b70, #0755c9 65%, #078fd0);
+      color: white;
+    }
+
+    .hero-content {
+      max-width: 760px;
+    }
+
+    .tag {
+      display: inline-block;
+      border: 1px solid #ffffff55;
+      padding: 9px 15px;
+      border-radius: 30px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 25px;
+    }
+
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(38px, 6vw, 66px);
+      line-height: 1.12;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 span {
+      color: #55e5ff;
+    }
+
+    .hero p {
+      max-width: 600px;
+      line-height: 1.8;
+      font-size: 17px;
+      color: #e2f1ff;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--blue);
+    }
+
+    .btn-outline {
+      border: 1px solid white;
+      color: white;
+    }
+
+    .section {
+      padding: 85px 8%;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 45px;
+    }
+
+    .section-heading small {
+      color: var(--blue);
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .section-heading h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(28px, 4vw, 40px);
+      margin: 12px 0;
+    }
+
+    .section-heading p {
+      color: #687991;
+      line-height: 1.7;
+    }
+
+    .about {
+      background: var(--light);
+    }
+
+    .about-content {
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+      line-height: 1.9;
+      color: #526783;
+    }
+
+    .courses {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .course-card {
+      padding: 32px 25px;
+      border: 1px solid #e1edfa;
+      border-radius: 15px;
+      background: white;
+      transition: 0.3s;
+    }
+
+    .course-card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 15px 35px #0755c918;
+    }
+
+    .course-icon {
+      width: 55px;
+      height: 55px;
+      display: grid;
+      place-items: center;
+      background: #e8f5ff;
+      color: var(--blue);
+      border-radius: 12px;
+      font-size: 25px;
+      margin-bottom: 22px;
+    }
+
+    .course-card h3 {
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+
+    .course-card p {
+      color: #718096;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .mock {
+      background: linear-gradient(120deg, #062b70, #0755c9);
+      color: white;
+      text-align: center;
+    }
+
+    .mock h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(30px, 4vw, 43px);
+      margin-bottom: 18px;
+    }
+
+    .mock p {
+      max-width: 650px;
+      margin: auto;
+      line-height: 1.8;
+      color: #d9eaff;
+    }
+
+    .mock .btn {
+      margin-top: 25px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature {
+      background: var(--light);
+      padding: 25px;
+      border-radius: 12px;
+    }
+
+    .feature h3 {
+      margin-bottom: 10px;
+    }
+
+    .feature p {
+      color: #687991;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    footer {
+      background: #061d46;
+      color: white;
+      padding: 50px 8% 25px;
+      text-align: center;
+    }
+
+    footer .logo {
+      color: white;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    footer p {
+      color: #c6d9f3;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .copyright {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ffffff25;
+      font-size: 12px;
+    }
+
+    @media (max-width: 750px) {
+      .navbar {
+        padding: 17px 5%;
+      }
+
+      .nav-links {
+        gap: 12px;
+        font-size: 12px;
+      }
+
+      .nav-links a:not(.nav-button) {
+        display: none;
+      }
+
+      .hero {
+        min-height: 540px;
+        padding: 75px 7%;
+      }
+
+      .section {
+        padding: 65px 6%;
+      }
+
+      .courses,
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="navbar">
+    <a href="#" class="logo">A² <span>TUTORIALS</span></a>
+
+    <nav class="nav-links">
+      <a href="#">Home</a>
+      <a href="#about">About</a>
+      <a href="#courses">Courses</a>
+      <a href="#mocks">Mocks</a>
+      <a href="#contact" class="nav-button">Contact Us</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-content">
+        <div class="tag">WELCOME TO A² TUTORIALS</div>
+
+        <h1>Your Journey to Academic <span>Excellence</span> Starts Here.</h1>
+
+        <p>
+          Preparing science students for UTME success through quality
+          teaching, consistent practice and effective examination preparation.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#courses" class="btn btn-white">Explore Our Courses</a>
+          <a href="#mocks" class="btn btn-outline">Explore Mock Exams</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section about" id="about">
+      <div class="section-heading">
+        <small>ABOUT US</small>
+        <h2>Excellence Is Our Standard</h2>
+      </div>
+
+      <div class="about-content">
+        <p>
+          A² Tutorials is committed to helping students achieve academic
+          excellence through structured learning, quality tutorials and
+          regular examination practice.
+        </p>
+        <p>
+          Our goal is to make every student more confident, knowledgeable
+          and prepared for their academic journey.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="courses">
+      <div class="section-heading">
+        <small>WHAT WE TEACH</small>
+        <h2>Our Science Courses</h2>
+        <p>Build a stronger foundation in your UTME subjects.</p>
+      </div>
+
+      <div class="courses">
+
+        <div class="course-card">
+          <div class="course-icon">∑</div>
+          <h3>Mathematics</h3>
+          <p>Understand mathematical concepts and improve your problem-solving skills.</p>
+        </div>
+
+        <div class="course-card">
+          <div class="course-icon">⚛</div>
+          <h3>Physics</h3>
+          <p>Master important physical principles and their practical applications.</p>
+        </div>
+
+        <div class="course-card">
+          <div class="course-icon">⚗</div>
+          <h3>Chemistry</h3>
+          <p>Develop a clear understanding of chemical concepts and reactions.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section mock" id="mocks">
+      <h2>Are You Ready for the Challenge?</h2>
+      <p>
+        Test your knowledge, improve your speed and prepare for examination
+        success through our upcoming UTME mock examinations.
+      </p>
+      <a href="#contact" class="btn btn-white">Mock Examinations Coming Soon</a>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <small>WHY A² TUTORIALS?</small>
+        <h2>Learn. Practise. Excel.</h2>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <h3>Quality Learning</h3>
+          <p>Clear explanations that help students understand difficult topics.</p>
+        </div>
+
+        <div class="feature">
+          <h3>Regular Practice</h3>
+          <p>Prepare with examination-style questions and timed mock tests.</p>
+        </div>
+
+        <div class="feature">
+          <h3>Academic Growth</h3>
+          <p>Build confidence and develop the skills needed for success.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="contact">
+    <a href="#" class="logo">A² TUTORIALS</a>
+    <p>Excellence in Learning, Success in Results.</p>
+    <p>Preparing students for a brighter academic future.</p>
+
+    <div class="copyright">
+      © 2026 A² Tutorials. All rights reserved.
+    </div>
+  </footer>
+
+</body>
+</html>
