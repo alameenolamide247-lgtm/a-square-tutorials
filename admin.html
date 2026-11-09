@@ -588,6 +588,7 @@ const timeSpent = `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
           <td>${timeSpent}</td>
           <td><span class="status">${escapeHTML(r.status)}</span></td>
           <td>${formatDate(r.submitted_at || r.started_at)}</td>
+          <td>${valid ? `<button class="primary download-result-btn" data-id="${r.id}" type="button">Download</button>` : "—"}</td>
         </tr>
       `;
     }).join("") : `<tr><td colspan="6" class="empty">No examination attempts yet.</td></tr>`;
