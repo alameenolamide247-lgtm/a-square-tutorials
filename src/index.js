@@ -458,6 +458,168 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
           }
 
           return json({ ok: true });
+                  // ==========================================
+        // A-SQUARE VIDEOS MANAGEMENT API
+
+        // List all videos for admin
+        if (url.pathname === "/api/admin/videos" && method === "GET") {
+          const result = await env.DB.prepare(`
+            SELECT *
+            FROM videos
+            ORDER BY created_at DESC
+          `).all();
+
+          return json({ videos: result.results || [] });
+        }
+
+        // Create a video
+        if (url.pathname === "/api/admin/videos" && method === "POST") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const title = String(body.title || "").trim();
+          const videoUrl = String(body.video_url || "").trim();
+          const platform = String(body.platform || "");
+          const isPublished = body.is_published === false ? 0 : 1;
+
+          if (title.length < 3 || title.length > 120) {
+            return json({ error: "Title must be between 3 and 120 characters." }, 400);
+          }
+
+          if (!["YouTube", "TikTok"].includes(platform)) {
+            return json({ error: "Select YouTube or TikTok." }, 400);
+          }
+
+          let parsedUrl;
+
+          try {
+            parsedUrl = new URL(videoUrl);
+          } catch {
+            return json({ error: "Enter a valid video URL." }, 400);
+          }
+
+          const host = parsedUrl.hostname.toLowerCase();
+          const validHost =
+            host === "youtube.com" ||
+            host.endsWith(".youtube.com") ||
+            host === "youtu.be" ||
+            host === "tiktok.com" ||
+            host.endsWith(".tiktok.com");
+
+          if (
+            !["https:", "http:"].includes(parsedUrl.protocol) ||
+            !validHost ||
+            (platform === "YouTube" &&
+              !["youtube.com", "youtu.be"].some(domain =>
+                host === domain || host.endsWith("." + domain)
+              )) ||
+            (platform === "TikTok" &&
+              !(host === "tiktok.com" || host.endsWith(".tiktok.com")))
+          ) {
+            return json({ error: "The URL does not match the selected platform." }, 400);
+          }
+
+          const id = crypto.randomUUID();
+
+          await env.DB.prepare(`
+            INSERT INTO videos (id, title, video_url, platform, is_published)
+            VALUES (?, ?, ?, ?, ?)
+          `).bind(id, title, parsedUrl.href, platform, isPublished).run();
+
+          return json({ ok: true, id, message: "Video saved successfully." }, 201);
+        }
+
+        // Edit or publish/unpublish a video
+        const videoMatch = url.pathname.match(
+          /^\/api\/admin\/videos\/([^/]+)$/
+        );
+
+        if (videoMatch && method === "PATCH") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const title = String(body.title || "").trim();
+          const videoUrl = String(body.video_url || "").trim();
+          const platform = String(body.platform || "");
+          const isPublished = Number(body.is_published);
+
+          if (title.length < 3 || title.length > 120) {
+            return json({ error: "Title must be between 3 and 120 characters." }, 400);
+          }
+
+          if (!["YouTube", "TikTok"].includes(platform)) {
+            return json({ error: "Select YouTube or TikTok." }, 400);
+          }
+
+          if (![0, 1].includes(isPublished)) {
+            return json({ error: "Invalid publishing status." }, 400);
+          }
+
+          let parsedUrl;
+
+          try {
+            parsedUrl = new URL(videoUrl);
+          } catch {
+            return json({ error: "Enter a valid video URL." }, 400);
+          }
+
+          const host = parsedUrl.hostname.toLowerCase();
+          const validHost =
+            platform === "YouTube"
+              ? host === "youtube.com" ||
+                host.endsWith(".youtube.com") ||
+                host === "youtu.be"
+              : host === "tiktok.com" ||
+                host.endsWith(".tiktok.com");
+
+          if (
+            !["https:", "http:"].includes(parsedUrl.protocol) ||
+            !validHost
+          ) {
+            return json({ error: "The URL does not match the selected platform." }, 400);
+          }
+
+          const result = await env.DB.prepare(`
+            UPDATE videos
+            SET title = ?, video_url = ?, platform = ?, is_published = ?
+            WHERE id = ?
+          `).bind(
+            title,
+            parsedUrl.href,
+            platform,
+            isPublished,
+            videoMatch[1]
+          ).run();
+
+          if (!result.meta?.changes) {
+            return json({ error: "Video not found." }, 404);
+          }
+
+          return json({ ok: true, message: "Video updated successfully." });
+        }
+
+        // Delete a video
+        if (videoMatch && method === "DELETE") {
+          const result = await env.DB.prepare(
+            "DELETE FROM videos WHERE id = ?"
+          ).bind(videoMatch[1]).run();
+
+          if (!result.meta?.changes) {
+            return json({ error: "Video not found." }, 404);
+          }
+
+          return json({ ok: true, message: "Video deleted successfully." });
+        }
         }
       }
       // ==========================================
