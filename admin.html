@@ -453,6 +453,42 @@ tbody tr:hover {
       </div>
     </div>
    </section>
+ <section class="page" id="videos">
+  <div class="panel">
+    <h2>Add Explanatory Video</h2>
+
+    <label>Video Title</label>
+    <input id="videoTitle" type="text" placeholder="Enter video title">
+
+    <label>Video URL</label>
+    <input id="videoUrl" type="url" placeholder="Paste YouTube or TikTok link">
+
+    <label>Platform</label>
+    <select id="videoPlatform">
+      <option value="YouTube">YouTube</option>
+      <option value="TikTok">TikTok</option>
+    </select>
+
+    <button class="primary" id="addVideoBtn">Add Video</button>
+  </div>
+
+  <div class="panel">
+    <h2>Manage Explanatory Videos</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Platform</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="videosTable"></tbody>
+      </table>
+    </div>
+  </div>
+ </section>
 
 </main>
 </div>
