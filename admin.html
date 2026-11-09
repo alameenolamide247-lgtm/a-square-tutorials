@@ -720,6 +720,45 @@ const timeSpent = `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
   } catch (e) { alert(e.message); }
 }
 
+ let adminResults = [];
+
+$("resultsTable").addEventListener("click", async (event) => {
+  const button = event.target.closest(".download-result-btn");
+  if (!button) return;
+
+  const result = adminResults.find(
+    r => String(r.id) === button.dataset.id
+  );
+
+  if (!result) {
+    alert("Result not found. Please refresh the Results page.");
+    return;
+  }
+
+  try {
+    button.disabled = true;
+    button.textContent = "Preparing...";
+
+    const blob = await createAdminResultCard(result);
+
+    if (!blob) throw new Error("Could not generate the result card.");
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${result.full_name}-${result.mock_title}-Result.png`
+      .replace(/[^\w.-]+/g, "_");
+
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Download";
+  }
+});
+ 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
