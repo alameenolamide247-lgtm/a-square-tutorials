@@ -881,7 +881,21 @@ if (examReviewMatch && method === "GET") {
           database: "connected"
         });
       }
+            // Load published A-Square videos
+      if (url.pathname === "/api/videos" && method === "GET") {
+        if (!env.DB) {
+          return json({ error: "Database is not configured." }, 500);
+        }
 
+        const result = await env.DB.prepare(`
+          SELECT id, title, video_url, platform
+          FROM videos
+          WHERE is_published = 1
+          ORDER BY created_at DESC
+        `).all();
+
+        return json({ videos: result.results || [] });
+      }
       // Load published mock examinations
       if (url.pathname === "/api/mocks" && method === "GET") {
         if (!env.DB) {
