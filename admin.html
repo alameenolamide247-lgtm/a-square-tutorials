@@ -759,7 +759,66 @@ $("resultsTable").addEventListener("click", async (event) => {
     button.textContent = "Download";
   }
 });
- 
+
+ $("downloadAllResultsBtn").addEventListener("click", async () => {
+  const completedResults = adminResults.filter(r =>
+    r.score !== null && Number(r.total_questions) > 0
+  );
+
+  if (!completedResults.length) {
+    alert("There are no completed results to download.");
+    return;
+  }
+
+  if (typeof JSZip === "undefined") {
+    alert("ZIP library could not load. Please refresh the page.");
+    return;
+  }
+
+  const button = $("downloadAllResultsBtn");
+
+  try {
+    button.disabled = true;
+    button.textContent = "Preparing ZIP...";
+
+    const zip = new JSZip();
+
+    for (let i = 0; i < completedResults.length; i++) {
+      const result = completedResults[i];
+
+      button.textContent =
+        `Preparing ${i + 1} of ${completedResults.length}...`;
+
+      const blob = await createAdminResultCard(result);
+
+      if (!blob) {
+        throw new Error("Could not generate a result card.");
+      }
+
+      const filename =
+        `${result.full_name}-${result.mock_title}-${result.id}-Result.png`
+          .replace(/[^\w.-]+/g, "_");
+
+      zip.file(filename, blob);
+    }
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(zipBlob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "A-Square-All-Student-Results.zip";
+    link.click();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Download All Results";
+  }
+});
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
