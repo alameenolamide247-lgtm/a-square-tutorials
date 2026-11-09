@@ -622,7 +622,7 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
           return json({ ok: true, message: "Video deleted successfully." });
         }
         }
-      }
+      
       // ==========================================
       // STUDENT CBT EXAMINATION API
 
