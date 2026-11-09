@@ -458,6 +458,7 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
           }
 
           return json({ ok: true });
+        }
                   // ==========================================
         // A-SQUARE VIDEOS MANAGEMENT API
 
