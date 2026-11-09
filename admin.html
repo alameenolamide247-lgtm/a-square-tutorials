@@ -1020,6 +1020,38 @@ $("mockForm").addEventListener("submit", async event => {
     alert(e.message);
   }
  }
+ $("addVideoBtn").addEventListener("click", async () => {
+  const title = $("videoTitle").value.trim();
+  const video_url = $("videoUrl").value.trim();
+  const platform = $("videoPlatform").value;
+
+  if (!title || !video_url) {
+    alert("Please enter the video title and URL.");
+    return;
+  }
+
+  try {
+    await api("/api/admin/videos", {
+      method: "POST",
+      body: JSON.stringify({
+        title,
+        video_url,
+        platform,
+        is_published: true
+      })
+    });
+
+    alert("Video added successfully!");
+
+    $("videoTitle").value = "";
+    $("videoUrl").value = "";
+
+    loadVideos();
+
+  } catch (e) {
+    alert(e.message);
+  }
+});
 async function loadAccessCodes() {
   try {
     const d = await api("/api/admin/codes");
