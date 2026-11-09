@@ -1078,6 +1078,46 @@ $("mockForm").addEventListener("submit", async event => {
     alert(e.message);
   }
      }
+ async function editVideo(id) {
+  try {
+    const d = await api("/api/admin/videos");
+    const video = d.videos.find(v => v.id === id);
+
+    if (!video) {
+      alert("Video not found.");
+      return;
+    }
+
+    const title = prompt("Enter the video title:", video.title);
+    if (title === null) return;
+
+    const video_url = prompt("Enter the video URL:", video.video_url);
+    if (video_url === null) return;
+
+    const platform = prompt(
+      "Enter platform: YouTube or TikTok",
+      video.platform
+    );
+
+    if (platform === null) return;
+
+    await api("/api/admin/videos/" + id, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: title.trim(),
+        video_url: video_url.trim(),
+        platform: platform.trim(),
+        is_published: Number(video.is_published)
+      })
+    });
+
+    alert("Video updated successfully!");
+    loadVideos();
+
+  } catch (e) {
+    alert(e.message);
+  }
+ }
 async function loadAccessCodes() {
   try {
     const d = await api("/api/admin/codes");
