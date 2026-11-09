@@ -1157,6 +1157,17 @@ $("shareResultBtn").addEventListener("click", async () => {
 });
   
 $("reviewBtn").addEventListener("click", loadReview);
+  $("getCodeBtn").addEventListener("click", () => {
+  const message =
+    "Hello A-Square Tutorials, I want to get an access code for " +
+    currentMockTitle + ".";
+
+  const whatsappURL =
+    "https://wa.me/2347045865800?text=" +
+    encodeURIComponent(message);
+
+  window.open(whatsappURL, "_blank");
+});
 loadMocks();
 </script>
 
