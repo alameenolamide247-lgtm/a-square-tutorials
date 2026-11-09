@@ -16,7 +16,70 @@ async function sha256(value) {
     .map(byte => byte.toString(16).padStart(2, "0"))
     .join("");
 }
+async function createAdminSession(password) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
 
+  const expires = Math.floor(Date.now() / 1000) + 8 * 60 * 60;
+  const payload = String(expires);
+
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(payload)
+  );
+
+  const signatureHex = [...new Uint8Array(signature)]
+    .map(byte => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+  return `${payload}.${signatureHex}`;
+}
+
+async function verifyAdminSession(request, password) {
+  if (!password) return false;
+
+  const cookie = request.headers.get("Cookie") || "";
+  const match = cookie.match(/(?:^|;\s*)asq_admin_session=([^;]+)/);
+
+  if (!match) return false;
+
+  const parts = match[1].split(".");
+  if (parts.length !== 2) return false;
+
+  const expires = Number(parts[0]);
+  if (!Number.isFinite(expires) || expires < Math.floor(Date.now() / 1000)) {
+    return false;
+  }
+
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["verify"]
+  );
+
+  const signature = new Uint8Array(
+    (parts[1].match(/.{2}/g) || []).map(byte => parseInt(byte, 16))
+  );
+
+  if (signature.length !== 32) return false;
+
+  return crypto.subtle.verify(
+    "HMAC",
+    key,
+    signature,
+    encoder.encode(parts[0])
+  );
+}
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
