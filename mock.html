@@ -998,7 +998,7 @@ async function createResultCard() {
   ctx.arc(100, 1500, 260, 0, Math.PI * 2);
   ctx.stroke();
 
-    // Header Logo
+      // Header Logo and Brand Name
   const logo = new Image();
   logo.src = "20261108_134629.png";
 
@@ -1009,17 +1009,26 @@ async function createResultCard() {
 
   ctx.save();
   ctx.beginPath();
-  ctx.roundRect(500, 45, 200, 200, 30);
+  ctx.roundRect(300, 55, 150, 150, 25);
   ctx.clip();
-  ctx.drawImage(logo, 500, 45, 200, 200);
+  ctx.drawImage(logo, 300, 55, 150, 150);
   ctx.restore();
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 65px Moanslight, Arial";
+  ctx.fillText("A-SQUARE", 480, 125);
+
+  ctx.fillStyle = "#75e5ff";
+  ctx.font = "42px Moanslight, Arial";
+  ctx.fillText("TUTORIALS", 480, 180);
 
   ctx.textAlign = "center";
   ctx.fillStyle = "#dceeff";
   ctx.font = "27px Moanslight, Arial";
   ctx.fillText(
     "Excellence in Learning, Success in Results",
-    600, 290
+    600, 270
   );
 
   // Divider
