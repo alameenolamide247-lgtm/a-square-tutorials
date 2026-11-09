@@ -359,6 +359,376 @@
         grid-template-columns: 1fr;
       }
     }
+    /* =================================
+   A² TUTORIALS — PREMIUM EXPERIENCE
+================================= */
+
+:root {
+  --blue: #0755c9;
+  --dark: #061d46;
+  --cyan: #12c5ed;
+  --light: #f2f8ff;
+}
+
+/* Smooth page experience */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
+
+body {
+  overflow-x: hidden;
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* PREMIUM NAVIGATION */
+.navbar {
+  padding: 17px 7%;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #eaf1fc;
+  transition: box-shadow .3s ease;
+}
+
+.logo {
+  letter-spacing: -1px;
+  transition: .3s ease;
+}
+
+.logo:hover {
+  color: var(--cyan);
+}
+
+.nav-links a {
+  transition: color .25s ease, transform .25s ease;
+}
+
+.nav-links a:not(.nav-button):hover {
+  color: var(--cyan);
+  transform: translateY(-2px);
+}
+
+.nav-button {
+  border-radius: 30px;
+  background: linear-gradient(110deg, #0755c9, #08b9e8);
+  box-shadow: 0 7px 20px #0755c933;
+  padding: 13px 24px;
+}
+
+.nav-button:hover {
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px #0755c955;
+}
+
+/* PREMIUM HERO SECTION */
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 650px;
+  background:
+    radial-gradient(circle at 85% 20%, #16d9ff38, transparent 25%),
+    radial-gradient(circle at 10% 90%, #438bff35, transparent 30%),
+    linear-gradient(125deg, #041b49, #0755c9 65%, #078fd0);
+}
+
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  border: 1px solid #ffffff18;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero::before {
+  width: 420px;
+  height: 420px;
+  right: -120px;
+  top: -130px;
+  box-shadow: 0 0 0 45px #ffffff08,
+              0 0 0 90px #ffffff05;
+}
+
+.hero::after {
+  width: 220px;
+  height: 220px;
+  right: 18%;
+  bottom: -150px;
+  box-shadow: 0 0 0 35px #ffffff08;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  animation: heroEnter 1s ease both;
+}
+
+.tag {
+  background: #ffffff12;
+  backdrop-filter: blur(10px);
+  border-color: #ffffff55;
+  box-shadow: 0 5px 20px #001b4930;
+  font-weight: 600;
+}
+
+.hero h1 {
+  letter-spacing: -1.8px;
+}
+
+.hero h1 span {
+  background: linear-gradient(90deg, #7af0ff, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero p {
+  font-size: 17px;
+}
+
+/* PREMIUM BUTTONS */
+.btn {
+  border-radius: 30px;
+  padding: 16px 28px;
+  transition: all .3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px #001b4935;
+}
+
+.btn-white {
+  box-shadow: 0 7px 20px #001b4930;
+}
+
+.btn-outline {
+  background: #ffffff0b;
+  backdrop-filter: blur(8px);
+}
+
+.btn-outline:hover {
+  background: white;
+  color: var(--blue);
+}
+
+/* SECTION HEADINGS */
+.section {
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
+.section-heading small {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 30px;
+  background: #e7f6ff;
+  color: #0755c9;
+  font-size: 11px;
+}
+
+.section-heading h2 {
+  letter-spacing: -1px;
+  color: #092b61;
+}
+
+.section-heading p {
+  max-width: 600px;
+  margin: auto;
+}
+
+/* ABOUT SECTION */
+.about {
+  background:
+    radial-gradient(circle at 10% 20%, #dceeff80, transparent 35%),
+    #f4f8ff;
+}
+
+.about-content {
+  background: white;
+  padding: 35px;
+  border: 1px solid #e5efff;
+  border-radius: 22px;
+  box-shadow: 0 12px 35px #08275b0b;
+}
+
+/* COURSE CARDS */
+.courses {
+  gap: 25px;
+}
+
+.course-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5edfa;
+  border-radius: 20px;
+  padding: 32px 27px;
+  box-shadow: 0 8px 25px #08275b08;
+  transition: transform .35s ease,
+              box-shadow .35s ease,
+              border-color .35s ease;
+}
+
+.course-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0755c9, #12c5ed);
+  transition: width .35s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-9px);
+  border-color: #b9dcff;
+  box-shadow: 0 20px 45px #0755c91c;
+}
+
+.course-card:hover::before {
+  width: 100%;
+}
+
+.course-icon {
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e5f3ff, #d8faff);
+  transition: transform .35s ease;
+}
+
+.course-card:hover .course-icon {
+  transform: rotate(-6deg) scale(1.08);
+}
+
+.course-card h3 {
+  color: #092b61;
+}
+
+/* MOCK EXAM SECTION */
+.mock {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 90% 10%, #12c5ed45, transparent 30%),
+    linear-gradient(125deg, #041b49, #0755c9 70%, #078fd0);
+}
+
+.mock h2 {
+  letter-spacing: -1px;
+}
+
+.mock .btn {
+  color: #0755c9;
+}
+
+/* FEATURES */
+.feature {
+  border: 1px solid #e3edfa;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ffffff, #f1f7ff);
+  box-shadow: 0 8px 25px #08275b09;
+  transition: all .3s ease;
+}
+
+.feature:hover {
+  transform: translateY(-7px);
+  border-color: #a9d9ff;
+  box-shadow: 0 17px 35px #0755c91a;
+}
+
+.feature h3 {
+  color: #0755c9;
+}
+
+/* FOOTER */
+footer {
+  background:
+    radial-gradient(circle at 50% 0%, #1255a044, transparent 45%),
+    #041631;
+  padding-top: 65px;
+}
+
+footer .logo {
+  font-size: 30px;
+}
+
+footer a:not(.logo) {
+  transition: color .25s ease;
+}
+
+footer a:not(.logo):hover {
+  color: #12c5ed;
+}
+
+.copyright {
+  border-color: #ffffff18;
+}
+
+/* ENTRANCE ANIMATIONS */
+@keyframes heroEnter {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* MOBILE POLISH */
+@media (max-width: 750px) {
+  .hero {
+    min-height: 560px;
+    padding-top: 85px;
+    padding-bottom: 85px;
+  }
+
+  .hero h1 {
+    letter-spacing: -1px;
+  }
+
+  .hero p {
+    font-size: 15px;
+  }
+
+  .section {
+    padding-top: 75px;
+    padding-bottom: 75px;
+  }
+
+  .about-content {
+    padding: 25px 20px;
+  }
+
+  .course-card {
+    padding: 27px 23px;
+  }
+
+  .hero-buttons {
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 14px 21px;
+  }
+  }
   </style>
 </head>
 
