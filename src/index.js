@@ -346,7 +346,8 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
               a.submitted_at,
               a.status,
               a.score,
-              a.total_questions
+              a.total_questions,
+ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.started_at)) * 86400) AS time_spent_seconds
             FROM attempts a
             JOIN students s ON s.id = a.student_id
             JOIN mocks m ON m.id = a.mock_id
