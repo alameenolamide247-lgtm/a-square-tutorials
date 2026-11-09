@@ -557,30 +557,48 @@ footer {
     </div>
   </section>
 
-  <section class="panel hidden" id="resultSection">
-    <div class="result">
-      <h2>Examination Completed!</h2>
-      <p class="muted">Your answers have been submitted and marked.</p>
-      <div class="result-score" id="resultScore">0/0</div>
-      <p id="resultMessage"></p>
-      <div class="notice">
-        Your result has been saved. Thank you for using A² Tutorials.
-      </div>
-      <button class="primary" id="reviewBtn"
-  style="margin-top:18px;width:100%">
-  Review My Answers
-</button>
+  
+<section class="panel hidden" id="resultSection">
+  <div class="result">
+    <h2>Examination Completed!</h2>
+    <p class="muted">Your answers have been submitted and marked.</p>
 
-<div id="reviewSection" class="hidden" style="margin-top:25px;text-align:left">
-  <h2>Answer Review</h2>
-  <p class="muted">Check your answers and learn from your mistakes.</p>
-  <div id="reviewList"></div>
-</div>
-      <button class="primary" onclick="location.reload()" style="margin-top:22px">
-        Return to Mock Portal
-      </button>
+    <div class="result-score" id="resultScore">0/0</div>
+    <p id="resultMessage"></p>
+
+    <div class="notice">
+      Your result has been saved. Thank you for using A² Tutorials.
     </div>
-  </section>
+
+    <button class="primary" id="downloadResultBtn"
+      style="margin-top:20px;width:100%">
+      Download Result (PNG)
+    </button>
+
+    <button class="primary hidden" id="shareResultBtn"
+      style="margin-top:12px;width:100%">
+      Share Result to A-Square on WhatsApp
+    </button>
+
+    <button class="primary" id="reviewBtn"
+      style="margin-top:18px;width:100%">
+      Review My Answers
+    </button>
+
+    <div id="reviewSection" class="hidden"
+      style="margin-top:25px;text-align:left">
+      <h2>Answer Review</h2>
+      <p class="muted">Check your answers and learn from your mistakes.</p>
+      <div id="reviewList"></div>
+    </div>
+
+    <button class="primary" onclick="location.reload()"
+      style="margin-top:22px">
+      Return to Mock Portal
+    </button>
+  </div>
+</section>
+  
 
 </main>
 
