@@ -870,8 +870,15 @@ async function submitExam(autoSubmitted) {
     $("examSection").classList.remove("show");
     $("resultSection").classList.remove("hidden");
 
-    $("resultScore").textContent =
-      result.score + " / " + result.totalQuestions;
+    actualScore = result.score;
+totalScore = result.totalQuestions;
+
+jambScore = totalScore > 0
+  ? Math.round((actualScore / totalScore) * 400)
+  : 0;
+
+$("resultScore").textContent =
+  actualScore + " / " + totalScore;
 
     $("resultMessage").textContent =
       autoSubmitted
