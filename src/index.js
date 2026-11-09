@@ -136,6 +136,227 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
     }
   });
 }
+            // ADMIN DASHBOARD API
+      if (url.pathname.startsWith("/api/admin/") &&
+          !["/api/admin/login", "/api/admin/session", "/api/admin/logout"].includes(url.pathname)) {
+
+        const authenticated = await verifyAdminSession(request, env.ADMIN_PASSWORD);
+
+        if (!authenticated) {
+          return json({ error: "Session expired. Please sign in again." }, 401);
+        }
+
+        if (!env.DB) {
+          return json({ error: "Database is not configured." }, 500);
+        }
+
+        // Dashboard statistics
+        if (url.pathname === "/api/admin/overview" && method === "GET") {
+          const [mocks, students, attempts, codes] = await Promise.all([
+            env.DB.prepare("SELECT COUNT(*) AS count FROM mocks").first(),
+            env.DB.prepare("SELECT COUNT(*) AS count FROM students").first(),
+            env.DB.prepare("SELECT COUNT(*) AS count FROM attempts").first(),
+            env.DB.prepare("SELECT COUNT(*) AS count FROM access_codes WHERE is_active = 1 AND redeemed_at IS NULL").first()
+          ]);
+
+          return json({
+            mocks: mocks?.count || 0,
+            students: students?.count || 0,
+            attempts: attempts?.count || 0,
+            unusedCodes: codes?.count || 0
+          });
+        }
+
+        // List all mocks
+        if (url.pathname === "/api/admin/mocks" && method === "GET") {
+          const result = await env.DB.prepare(`
+            SELECT m.*,
+              (SELECT COUNT(*) FROM questions q WHERE q.mock_id = m.id) AS saved_questions
+            FROM mocks m
+            ORDER BY m.created_at DESC
+          `).all();
+
+          return json({
+            mocks: (result.results || []).map(m => ({
+              ...m,
+              subjects: JSON.parse(m.subjects_json || "[]")
+            }))
+          });
+        }
+
+        // Create a mock and save its questions
+        if (url.pathname === "/api/admin/mocks" && method === "POST") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const title = String(body.title || "").trim();
+          const subjects = Array.isArray(body.subjects)
+            ? [...new Set(body.subjects)]
+            : [];
+          const duration = Number(body.durationMinutes);
+          const questions = Array.isArray(body.questions)
+            ? body.questions
+            : [];
+          const status = body.status === "published" ? "published" : "draft";
+
+          const validSubjects = [
+            "Use of English",
+            "Mathematics",
+            "Physics",
+            "Chemistry",
+            "Biology"
+          ];
+
+          if (title.length < 3 || title.length > 120) {
+            return json({ error: "Enter a mock title between 3 and 120 characters." }, 400);
+          }
+
+          if (!subjects.length || subjects.some(s => !validSubjects.includes(s))) {
+            return json({ error: "Select at least one valid subject." }, 400);
+          }
+
+          if (!Number.isInteger(duration) || duration < 1 || duration > 600) {
+            return json({ error: "Duration must be between 1 and 600 minutes." }, 400);
+          }
+
+          if (!questions.length || questions.length > 300) {
+            return json({ error: "Add between 1 and 300 questions." }, 400);
+          }
+
+          for (const q of questions) {
+            const options = q.options || {};
+            const keys = ["A", "B", "C", "D"];
+
+            if (
+              !String(q.questionText || "").trim() ||
+              keys.some(k => !String(options[k] || "").trim()) ||
+              !keys.includes(String(q.correctOption || "").toUpperCase())
+            ) {
+              return json({
+                error: "Every question needs question text, four options and a correct answer."
+              }, 400);
+            }
+          }
+
+          const mockId = crypto.randomUUID();
+
+          const statements = [
+            env.DB.prepare(`
+              INSERT INTO mocks
+              (id, title, subjects_json, duration_minutes, question_count, status)
+              VALUES (?, ?, ?, ?, ?, ?)
+            `).bind(
+              mockId,
+              title,
+              JSON.stringify(subjects),
+              duration,
+              questions.length,
+              status
+            )
+          ];
+
+          questions.forEach((q, index) => {
+            statements.push(
+              env.DB.prepare(`
+                INSERT INTO questions
+                (id, mock_id, question_text, options_json, correct_option, explanation, sort_order)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+              `).bind(
+                crypto.randomUUID(),
+                mockId,
+                String(q.questionText).trim(),
+                JSON.stringify(q.options),
+                String(q.correctOption).toUpperCase(),
+                String(q.explanation || "").trim() || null,
+                index + 1
+              )
+            );
+          });
+
+          await env.DB.batch(statements);
+
+          return json({
+            ok: true,
+            mockId,
+            message: status === "published"
+              ? "Mock created and published."
+              : "Mock saved as draft."
+          }, 201);
+        }
+
+        // Change mock status
+        const statusMatch = url.pathname.match(
+          /^\/api\/admin\/mocks\/([^/]+)\/status$/
+        );
+
+        if (statusMatch && method === "PATCH") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const status = String(body.status || "");
+
+          if (!["draft", "published", "archived"].includes(status)) {
+            return json({ error: "Invalid status." }, 400);
+          }
+
+          const result = await env.DB.prepare(
+            "UPDATE mocks SET status = ? WHERE id = ?"
+          ).bind(status, statusMatch[1]).run();
+
+          if (!result.meta?.changes) {
+            return json({ error: "Mock not found." }, 404);
+          }
+
+          return json({ ok: true });
+        }
+
+        // List students
+        if (url.pathname === "/api/admin/students" && method === "GET") {
+          const result = await env.DB.prepare(`
+            SELECT s.id, s.full_name, s.created_at,
+              COUNT(DISTINCT a.id) AS attempts_count
+            FROM students s
+            LEFT JOIN attempts a ON a.student_id = s.id
+            GROUP BY s.id
+            ORDER BY s.created_at DESC
+            LIMIT 500
+          `).all();
+
+          return json({ students: result.results || [] });
+        }
+
+        // List examination results
+        if (url.pathname === "/api/admin/results" && method === "GET") {
+          const result = await env.DB.prepare(`
+            SELECT
+              a.id,
+              s.full_name,
+              m.title AS mock_title,
+              a.started_at,
+              a.submitted_at,
+              a.status,
+              a.score,
+              a.total_questions
+            FROM attempts a
+            JOIN students s ON s.id = a.student_id
+            JOIN mocks m ON m.id = a.mock_id
+            ORDER BY COALESCE(a.submitted_at, a.started_at) DESC
+            LIMIT 500
+          `).all();
+
+          return json({ results: result.results || [] });
+        }
+      }
       // Test database connection
       if (url.pathname === "/api/health" && method === "GET") {
         if (!env.DB) {
