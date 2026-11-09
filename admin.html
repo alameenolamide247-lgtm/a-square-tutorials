@@ -1118,6 +1118,23 @@ $("mockForm").addEventListener("submit", async event => {
     alert(e.message);
   }
  }
+ async function deleteVideo(id) {
+  if (!confirm("Are you sure you want to delete this video?")) {
+    return;
+  }
+
+  try {
+    await api("/api/admin/videos/" + id, {
+      method: "DELETE"
+    });
+
+    alert("Video deleted successfully!");
+    loadVideos();
+
+  } catch (e) {
+    alert(e.message);
+  }
+ }
 async function loadAccessCodes() {
   try {
     const d = await api("/api/admin/codes");
