@@ -1,1 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | A² Tutorials</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #07152f;
+      color: #fff;
+      display: grid;
+      place-items: center;
+    }
+    .panel {
+      width: 100%;
+      max-width: 420px;
+      padding: 30px;
+      border-radius: 18px;
+      background: #10264b;
+      border: 1px solid #244878;
+    }
+    h1 { margin: 0 0 8px; font-size: 25px; }
+    p { color: #b8c9e5; line-height: 1.5; }
+    label { display: block; margin: 22px 0 8px; }
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #49658e;
+      border-radius: 9px;
+      background: #07152f;
+      color: white;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border: 0;
+      border-radius: 9px;
+      background: #13bde8;
+      color: #07152f;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #message { margin-top: 16px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <h1>A² Tutorials</h1>
+    <p>Administrator Portal</p>
 
+    <form id="loginForm">
+      <label for="password">Admin password</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Enter admin password"
+        autocomplete="current-password"
+        required
+      >
+      <button type="submit">Sign in</button>
+    </form>
+
+    <p id="message" role="status"></p>
+  </main>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const message = document.getElementById("message");
+      message.textContent = "Admin sign-in will be connected in the next step.";
+
+      // Authentication will be handled securely by the server.
+      // Do not put the admin password or secret in this file.
+    });
+  </script>
+</body>
+</html>
