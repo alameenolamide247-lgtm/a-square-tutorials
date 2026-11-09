@@ -343,6 +343,7 @@ const timeSpent = `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
           <td>${escapeHTML(r.mock_title)}</td>
           <td>${valid ? `${raw} / ${total}` : "Not marked"}</td>
           <td>${valid ? `${converted} / 400` : "—"}</td>
+          <td>${timeSpent}</td>
           <td><span class="status">${escapeHTML(r.status)}</span></td>
           <td>${formatDate(r.submitted_at || r.started_at)}</td>
         </tr>
