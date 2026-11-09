@@ -1118,7 +1118,14 @@ async function createResultCard() {
   ctx.fillStyle = "#75e5ff";
   ctx.font = "bold 48px Moanslight, Arial";
   ctx.fillText("07045865800", 600, 1495);
-
+  // Motivational Footer
+  ctx.fillStyle = "#dceeff";
+  ctx.font = "24px Moanslight, Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(
+    "Every result is a step closer to excellence. Keep pushing!",
+    600, 1560
+  );
   return new Promise(resolve => {
     canvas.toBlob(blob => {
       resolve(blob);
