@@ -357,6 +357,195 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           return json({ results: result.results || [] });
         }
       }
+      // ==========================================
+// STUDENT CBT EXAMINATION API
+// ==========================================
+
+// Load questions for an active examination
+const examQuestionsMatch = url.pathname.match(
+  /^\/api\/exam\/([^/]+)\/questions$/
+);
+
+if (examQuestionsMatch && method === "GET") {
+  const attemptId = examQuestionsMatch[1];
+
+  const attempt = await env.DB.prepare(`
+    SELECT a.id, a.mock_id, a.started_at, a.status,
+           m.title, m.duration_minutes
+    FROM attempts a
+    JOIN mocks m ON m.id = a.mock_id
+    WHERE a.id = ?
+  `).bind(attemptId).first();
+
+  if (!attempt) {
+    return json({ error: "Examination not found." }, 404);
+  }
+
+  if (attempt.status !== "in_progress") {
+    return json({ error: "This examination has already ended." }, 400);
+  }
+
+  const questions = await env.DB.prepare(`
+    SELECT id, question_text, options_json, sort_order
+    FROM questions
+    WHERE mock_id = ?
+    ORDER BY sort_order ASC
+  `).bind(attempt.mock_id).all();
+
+  const startedAt = new Date(attempt.started_at).getTime();
+  const deadline = startedAt + attempt.duration_minutes * 60000;
+  const remainingSeconds = Math.max(
+    0,
+    Math.floor((deadline - Date.now()) / 1000)
+  );
+
+  return json({
+    attemptId: attempt.id,
+    title: attempt.title,
+    durationMinutes: attempt.duration_minutes,
+    remainingSeconds,
+    questions: (questions.results || []).map(q => ({
+      id: q.id,
+      questionText: q.question_text,
+      options: JSON.parse(q.options_json)
+    }))
+  });
+}
+
+// Submit and automatically mark an examination
+const examSubmitMatch = url.pathname.match(
+  /^\/api\/exam\/([^/]+)\/submit$/
+);
+
+if (examSubmitMatch && method === "POST") {
+  const attemptId = examSubmitMatch[1];
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid submission." }, 400);
+  }
+
+  const answers = body.answers || {};
+
+  if (
+    !answers ||
+    typeof answers !== "object" ||
+    Array.isArray(answers)
+  ) {
+    return json({ error: "Invalid answers." }, 400);
+  }
+
+  const attempt = await env.DB.prepare(`
+    SELECT a.id, a.mock_id, a.started_at, a.status,
+           m.duration_minutes
+    FROM attempts a
+    JOIN mocks m ON m.id = a.mock_id
+    WHERE a.id = ?
+  `).bind(attemptId).first();
+
+  if (!attempt) {
+    return json({ error: "Examination not found." }, 404);
+  }
+
+  if (attempt.status !== "in_progress") {
+    return json({ error: "This examination has already been submitted." }, 400);
+  }
+
+  const questionsResult = await env.DB.prepare(`
+    SELECT id, correct_option, explanation
+    FROM questions
+    WHERE mock_id = ?
+    ORDER BY sort_order ASC
+  `).bind(attempt.mock_id).all();
+
+  const questions = questionsResult.results || [];
+  const validIds = new Set(questions.map(q => q.id));
+
+  for (const questionId of Object.keys(answers)) {
+    if (!validIds.has(questionId)) {
+      return json({ error: "Invalid question in submission." }, 400);
+    }
+
+    const selected = String(answers[questionId] || "").toUpperCase();
+
+    if (!["A", "B", "C", "D"].includes(selected)) {
+      return json({ error: "Invalid answer option." }, 400);
+    }
+  }
+
+  let score = 0;
+
+  const statements = [];
+
+  for (const q of questions) {
+    const selected = String(answers[q.id] || "").toUpperCase();
+    const correct = String(q.correct_option).toUpperCase();
+
+    if (selected && selected === correct) {
+      score++;
+    }
+
+    if (selected) {
+      statements.push(
+        env.DB.prepare(`
+          INSERT INTO answers
+          (attempt_id, question_id, selected_option, answered_at)
+          VALUES (?, ?, ?, ?)
+        `).bind(
+          attemptId,
+          q.id,
+          selected,
+          new Date().toISOString()
+        )
+      );
+    }
+  }
+
+  const now = new Date();
+  const deadline =
+    new Date(attempt.started_at).getTime() +
+    attempt.duration_minutes * 60000;
+
+  const finalStatus =
+    now.getTime() >= deadline ? "expired" : "submitted";
+
+  statements.push(
+    env.DB.prepare(`
+      UPDATE attempts
+      SET submitted_at = ?,
+          status = ?,
+          score = ?,
+          total_questions = ?
+      WHERE id = ? AND status = 'in_progress'
+    `).bind(
+      now.toISOString(),
+      finalStatus,
+      score,
+      questions.length,
+      attemptId
+    )
+  );
+
+  const results = await env.DB.batch(statements);
+
+  const updateResult = results[results.length - 1];
+
+  if (!updateResult?.meta?.changes) {
+    return json({
+      error: "This examination has already been submitted."
+    }, 409);
+  }
+
+  return json({
+    ok: true,
+    score,
+    totalQuestions: questions.length,
+    status: finalStatus,
+    message: "Your examination has been marked successfully."
+  });
+}
       // Test database connection
       if (url.pathname === "/api/health" && method === "GET") {
         if (!env.DB) {
