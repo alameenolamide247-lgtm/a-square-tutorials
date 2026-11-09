@@ -86,6 +86,56 @@ export default {
     const method = request.method.toUpperCase();
 
     try {
+      // Admin login
+if (url.pathname === "/api/admin/login" && method === "POST") {
+  if (!env.ADMIN_PASSWORD) {
+    return json({ error: "Admin password is not configured." }, 500);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request." }, 400);
+  }
+
+  const submitted = String(body.password || "");
+
+  if (submitted.length > 200 || submitted !== env.ADMIN_PASSWORD) {
+    return json({ error: "Incorrect admin password." }, 401);
+  }
+
+  const session = await createAdminSession(env.ADMIN_PASSWORD);
+
+  return new Response(JSON.stringify({ ok: true }), {
+    headers: {
+      "content-type": "application/json",
+      "cache-control": "no-store",
+      "set-cookie": `asq_admin_session=${session}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800`
+    }
+  });
+}
+
+// Check admin session
+if (url.pathname === "/api/admin/session" && method === "GET") {
+  const authenticated = await verifyAdminSession(
+    request,
+    env.ADMIN_PASSWORD
+  );
+
+  return json({ authenticated });
+}
+
+// Admin logout
+if (url.pathname === "/api/admin/logout" && method === "POST") {
+  return new Response(JSON.stringify({ ok: true }), {
+    headers: {
+      "content-type": "application/json",
+      "cache-control": "no-store",
+      "set-cookie": "asq_admin_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"
+    }
+  });
+}
       // Test database connection
       if (url.pathname === "/api/health" && method === "GET") {
         if (!env.DB) {
