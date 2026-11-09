@@ -334,6 +334,8 @@ async function loadResults() {
       const valid = r.score !== null && total > 0;
       const raw = valid ? Math.round(score) : null;
       const converted = valid ? Math.round((score / total) * 400) : null;
+     const seconds = Number(r.time_spent_seconds) || 0;
+const timeSpent = `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 
       return `
         <tr>
