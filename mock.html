@@ -1,115 +1,473 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#073b91">
-  <meta name="description" content="A² Tutorials UTME mock examination portal.">
-  <title>Mock Portal | A² Tutorials</title>
-  <style>
-    @font-face{font-family:Moanslight;src:url('./moanslight-regular.ttf') format('truetype');font-weight:400}
-    @font-face{font-family:Moanslight;src:url('./moanslight-medium.ttf') format('truetype');font-weight:500}
-    @font-face{font-family:Moanslight;src:url('./moanslight-semibold.ttf') format('truetype');font-weight:600}
-    @font-face{font-family:Moanslight;src:url('./moanslight-bold.ttf') format('truetype');font-weight:700}
-    :root{--blue:#0755c9;--dark:#08275b;--cyan:#12c5ed;--muted:#64748b;--line:#dce8f5}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Moanslight,Arial,sans-serif;background:#f7faff;color:var(--dark);min-height:100vh}
-    a{text-decoration:none;color:inherit}
-    .topbar{background:#fff;border-bottom:1px solid var(--line);padding:16px max(5%,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .brand{font-size:23px;font-weight:700;color:var(--blue)}.brand span{color:var(--cyan)}
-    .back{font-size:14px;font-weight:600;color:var(--blue)}
-    .hero{background:radial-gradient(circle at 85% 10%,#12c5ed55,transparent 30%),linear-gradient(120deg,#062b70,#0755c9 68%,#078fd0);color:white;padding:58px 5% 66px;text-align:center}
-    .eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:#bcefff;margin-bottom:13px}
-    h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:13px}
-    .hero p{color:#e1efff;line-height:1.7;max-width:620px;margin:auto;font-size:15px}
-    main{max-width:1050px;margin:0 auto;padding:42px 20px 70px}
-    .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px}
-    h2{font-size:24px}.sub{color:var(--muted);font-size:14px;margin-top:5px}
-    .status{font-size:12px;font-weight:700;background:#e8f5ff;color:var(--blue);padding:8px 11px;border-radius:30px}
-    .empty,.mock-card,.verify{background:white;border:1px solid var(--line);border-radius:17px;box-shadow:0 8px 28px #08275b08}
-    .empty{text-align:center;padding:48px 20px}
-    .empty-icon{width:62px;height:62px;border-radius:18px;background:#eaf5ff;color:var(--blue);display:grid;place-items:center;font-size:28px;margin:0 auto 17px}
-    .empty h3{font-size:19px;margin-bottom:8px}.empty p{font-size:14px;color:var(--muted);line-height:1.7;max-width:440px;margin:auto}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-    .mock-card{padding:22px;display:flex;flex-direction:column;gap:15px}
-    .available{font-size:11px;color:#087443;background:#e7f8ef;padding:6px 9px;border-radius:20px;font-weight:700}
-    .mock-card h3{font-size:19px}.details{display:grid;gap:10px}
-    .detail{display:flex;justify-content:space-between;gap:12px;font-size:13px}.detail span{color:var(--muted)}.detail strong{text-align:right}
-    button,.primary{border:0;border-radius:9px;background:var(--blue);color:#fff;font:600 14px Moanslight,Arial,sans-serif;padding:13px 18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;min-height:46px}
-    button:hover,.primary:hover{background:#0646a8}.primary{width:100%}
-    .verify{max-width:500px;margin:30px auto 0;padding:25px;display:none}
-    .verify.show{display:block}.verify h3{font-size:21px;margin-bottom:7px}.verify .hint{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:20px}
-    label{display:block;font-size:13px;font-weight:600;margin:15px 0 7px}
-    input{width:100%;padding:13px 14px;border:1px solid #cad8e8;border-radius:9px;font:14px Moanslight,Arial,sans-serif;outline:none}
-    input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #0755c918}
-    .verify button{width:100%;margin-top:17px}.error{display:none;color:#b42318;background:#fff0ee;border:1px solid #ffd3ce;border-radius:9px;padding:11px 12px;font-size:13px;margin-top:14px;line-height:1.5}
-    .error.show{display:block}.wa{display:none;background:#12834b;color:white;width:100%;margin-top:10px}.wa.show{display:flex}.wa:hover{background:#0d6e3e}
-    .foot{text-align:center;color:#8392a7;font-size:12px;padding:25px 15px 35px}
-    .notice{font-size:12px;color:var(--muted);line-height:1.6;margin-top:17px;text-align:center}
-    @media(max-width:600px){.hero{padding:46px 6% 52px}main{padding:30px 15px 55px}.section-head{align-items:start;flex-direction:column}.verify{padding:20px}}
-  </style>
-</head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="./index.html">A² <span>TUTORIALS</span></a>
-    <a class="back" href="./index.html">← Back to website</a>
-  </header>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#073b91">
+<title>Student CBT Portal | A² Tutorials</title>
 
-  <section class="hero">
-    <div class="eyebrow">EXCELLENCE IN LEARNING, SUCCESS IN RESULTS</div>
-    <h1>Mock Examination Portal</h1>
-    <p>Challenge yourself, practise under timed conditions and build confidence for your UTME examinations.</p>
+<style>
+@font-face {
+  font-family: Moanslight;
+  src: url('./moanslight-regular.ttf');
+  font-weight: 400;
+}
+@font-face {
+  font-family: Moanslight;
+  src: url('./moanslight-semibold.ttf');
+  font-weight: 600;
+}
+@font-face {
+  font-family: Moanslight;
+  src: url('./moanslight-bold.ttf');
+  font-weight: 700;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Moanslight,Arial,sans-serif;background:#f3f7ff;color:#092653;min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer;border:0;border-radius:9px;padding:13px 19px;font-weight:700}
+.topbar{background:white;padding:17px 6%;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 15px #09265310}
+.brand{font-size:23px;font-weight:700;color:#0755c9}
+.brand span{color:#12c5ed}
+.back{color:#0755c9;text-decoration:none;font-size:13px}
+.hero{background:linear-gradient(120deg,#062b70,#0755c9 70%,#078fd0);color:white;text-align:center;padding:55px 20px}
+.hero h1{font-size:clamp(30px,5vw,45px);margin-bottom:12px}
+.hero p{color:#e0f2ff;font-size:14px;line-height:1.7}
+main{max-width:950px;margin:auto;padding:35px 17px 65px}
+.panel{background:white;border:1px solid #e0e9f5;border-radius:15px;padding:24px;margin-bottom:20px;box-shadow:0 6px 25px #09265308}
+h2{font-size:21px;margin-bottom:10px}
+.muted{font-size:13px;color:#71809b;line-height:1.6}
+.mock-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-top:20px}
+.mock-card{border:1px solid #e0e9f5;border-radius:12px;padding:19px}
+.mock-card h3{font-size:17px;margin-bottom:12px}
+.mock-card p{font-size:13px;color:#71809b;margin:7px 0}
+.primary{background:#0755c9;color:white}
+.primary:hover{background:#0646a8}
+.secondary{background:#e9f2ff;color:#0755c9}
+.danger{background:#ffe9e9;color:#b42318}
+input{width:100%;padding:13px;border:1px solid #d3deeb;border-radius:9px;margin:8px 0 17px;outline:none}
+input:focus{border-color:#0755c9}
+label{font-size:13px;font-weight:700}
+.verify{display:none}
+.verify.show{display:block}
+.error{color:#b42318;font-size:13px;margin-top:12px}
+.exam{display:none}
+.exam.show{display:block}
+.exam-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.timer{background:#e9f2ff;color:#0755c9;padding:12px 17px;border-radius:10px;font-weight:700;font-size:20px}
+.timer.warning{background:#fff0e6;color:#b54708}
+.progress{height:7px;background:#e8eef7;border-radius:20px;margin:18px 0;overflow:hidden}
+.progress div{height:100%;background:#12bde8;width:0%;transition:.2s}
+.question-number{font-size:13px;color:#0755c9;font-weight:700;margin-bottom:13px}
+.question-text{font-size:19px;line-height:1.65;margin-bottom:22px}
+.option{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid #dce5f0;border-radius:10px;margin:10px 0;cursor:pointer;font-size:14px;line-height:1.5}
+.option:hover{background:#f4f9ff}
+.option.selected{border-color:#0755c9;background:#edf5ff}
+.option input{width:auto;margin:2px 0;accent-color:#0755c9}
+.exam-actions{display:flex;justify-content:space-between;gap:10px;margin-top:25px;flex-wrap:wrap}
+.question-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.question-nav button{width:39px;height:39px;padding:0;background:#edf2f8;color:#092653}
+.question-nav button.current{background:#0755c9;color:white}
+.question-nav button.answered{background:#d8f5e7;color:#087443}
+.question-nav button.current.answered{background:#0755c9;color:white}
+.result{text-align:center;padding:40px 20px}
+.result-score{font-size:54px;color:#0755c9;font-weight:700;margin:20px 0}
+.notice{background:#eff7ff;padding:13px;border-radius:9px;font-size:12px;color:#526782;margin-top:15px;line-height:1.6}
+.empty{text-align:center;padding:30px;color:#71809b}
+.hidden{display:none!important}
+footer{text-align:center;color:#8794a8;font-size:12px;padding:25px}
+@media(max-width:550px){
+ .panel{padding:18px}
+ .question-text{font-size:17px}
+ .exam-actions button{flex:1}
+ .topbar{padding:15px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <a class="brand" href="./index.html">A² <span>TUTORIALS</span></a>
+  <a class="back" href="./index.html">Back to website</a>
+</header>
+
+<section class="hero">
+  <h1>Student CBT Portal</h1>
+  <p>Learn. Practise. Excel. Your journey to examination success starts here.</p>
+</section>
+
+<main>
+
+  <section class="panel" id="mockSection">
+    <h2>Available Mock Examinations</h2>
+    <p class="muted">Choose an examination to continue.</p>
+    <div id="mockList" class="mock-grid">
+      <div class="empty">Loading available examinations...</div>
+    </div>
   </section>
 
-  <main>
-    <div class="section-head">
+  <section class="panel verify" id="verifySection">
+    <h2>Student Verification</h2>
+    <p class="muted" id="selectedMock"></p>
+
+    <form id="verifyForm">
+      <label for="fullName">Full name</label>
+      <input id="fullName" required minlength="3" maxlength="100"
+        placeholder="Enter your full name">
+
+      <label for="accessCode">Examination access code</label>
+      <input id="accessCode" required maxlength="40"
+        autocomplete="off" placeholder="Enter your access code">
+
+      <button class="primary" id="verifyButton" type="submit">
+        Verify and Start Examination
+      </button>
+
+      <p class="error" id="verifyError"></p>
+    </form>
+
+    <div class="notice">
+      Each access code can only be used once. Your examination time begins
+      immediately after successful verification.
+    </div>
+  </section>
+
+  <section class="panel exam" id="examSection">
+    <div class="exam-top">
       <div>
-        <h2>Available Mock Examinations</h2>
-        <p class="sub">Select a mock to view its details and verify your access code.</p>
+        <h2 id="examTitle">Examination</h2>
+        <p class="muted" id="studentLabel"></p>
       </div>
-      <span class="status" id="mock-count">0 mocks available</span>
+      <div class="timer" id="timer">00:00</div>
     </div>
 
-    <div id="mock-list" class="grid" aria-live="polite">
-      <div class="empty" style="grid-column:1/-1">
-        <div class="empty-icon">▤</div>
-        <h3>No Available Mocks</h3>
-        <p>There are currently no mock examinations available. Please check back later.</p>
-      </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="question-number" id="questionNumber"></div>
+    <div class="question-text" id="questionText"></div>
+
+    <div id="options"></div>
+
+    <div class="exam-actions">
+      <button class="secondary" id="previousBtn">Previous</button>
+      <button class="primary" id="nextBtn">Next</button>
     </div>
 
-    <section class="verify" id="verify-panel">
-      <h3>Student verification</h3>
-      <p class="hint" id="selected-mock">Enter your details to continue to the examination.</p>
-      <form id="verify-form">
-        <input type="hidden" id="mock-id">
-        <label for="student-name">Full name</label>
-        <input id="student-name" name="studentName" autocomplete="name" maxlength="100" placeholder="Enter your full name" required>
-        <label for="access-code">Access code</label>
-        <input id="access-code" name="accessCode" autocomplete="off" autocapitalize="characters" maxlength="40" placeholder="Enter your active code" required>
-        <button id="verify-button" type="submit">Verify and continue</button>
-        <div class="error" id="error-message" role="alert"></div>
-        <a class="primary wa" id="whatsapp-link" href="#" target="_blank" rel="noopener">Chat on WhatsApp to get a code</a>
-      </form>
-      <p class="notice">Each access code can be used once only. After successful verification, it cannot be used for another mock.</p>
-    </section>
-  </main>
+    <div class="notice">
+      Question navigation:
+      <div class="question-nav" id="questionNav"></div>
+    </div>
 
-  <footer class="foot">© 2026 A² Tutorials. All rights reserved.</footer>
+    <div style="margin-top:25px">
+      <button class="danger" id="submitBtn" style="width:100%">
+        Submit Examination
+      </button>
+    </div>
+  </section>
 
-  <script>
-    /*
-      FRONT-END PHASE ONLY:
-      No mocks are published yet, so this page intentionally shows the empty state.
-      Code verification must be connected to the Cloudflare Worker + D1 backend
-      before accepting real students or real access codes.
-    */
-    const whatsappMessage = 'Hello A² Tutorials, I want to get an access code for the UTME mock examination.';
-    document.getElementById('whatsapp-link').href =
-      'https://wa.me/2347045865800?text=' + encodeURIComponent(whatsappMessage);
+  <section class="panel hidden" id="resultSection">
+    <div class="result">
+      <h2>Examination Completed!</h2>
+      <p class="muted">Your answers have been submitted and marked.</p>
+      <div class="result-score" id="resultScore">0/0</div>
+      <p id="resultMessage"></p>
+      <div class="notice">
+        Your result has been saved. Thank you for using A² Tutorials.
+      </div>
+      <button class="primary" onclick="location.reload()" style="margin-top:22px">
+        Return to Mock Portal
+      </button>
+    </div>
+  </section>
 
-    // The API integration will be added with the secure backend in the next phase.
-    // Never validate access codes in browser-only JavaScript.
-  </script>
+</main>
+
+<footer>© 2026 A² Tutorials. All rights reserved.</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let selectedMockId = null;
+let attemptId = null;
+let studentName = "";
+let questions = [];
+let answers = {};
+let currentQuestion = 0;
+let remainingSeconds = 0;
+let timerInterval = null;
+let submitting = false;
+
+async function api(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "Something went wrong.");
+  }
+
+  return data;
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[c]);
+}
+
+async function loadMocks() {
+  try {
+    const data = await api("/api/mocks");
+    const list = $("mockList");
+
+    if (!data.mocks || !data.mocks.length) {
+      list.innerHTML = '<div class="empty">No mock examinations are currently available.</div>';
+      return;
+    }
+
+    list.innerHTML = data.mocks.map(mock => `
+      <div class="mock-card">
+        <h3>${escapeHTML(mock.title)}</h3>
+        <p><strong>Subjects:</strong> ${escapeHTML(mock.subjects.join(", "))}</p>
+        <p><strong>Duration:</strong> ${mock.durationMinutes} minutes</p>
+        <p><strong>Questions:</strong> ${mock.questionCount}</p>
+        <button class="primary" style="width:100%;margin-top:12px"
+          data-mock-id="${escapeHTML(mock.id)}"
+          data-mock-title="${escapeHTML(mock.title)}">
+          Start Mock
+        </button>
+      </div>
+    `).join("");
+
+    list.querySelectorAll("button[data-mock-id]").forEach(button => {
+      button.addEventListener("click", () => {
+        selectedMockId = button.dataset.mockId;
+        $("selectedMock").textContent =
+          "Selected examination: " + button.dataset.mockTitle;
+
+        $("mockSection").classList.add("hidden");
+        $("verifySection").classList.add("show");
+        $("verifySection").scrollIntoView({behavior:"smooth"});
+      });
+    });
+
+  } catch (error) {
+    $("mockList").innerHTML =
+      '<div class="empty">Unable to load mocks. Please refresh the page.</div>';
+  }
+}
+
+$("verifyForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const button = $("verifyButton");
+  $("verifyError").textContent = "";
+
+  studentName = $("fullName").value.trim();
+
+  button.disabled = true;
+  button.textContent = "Verifying...";
+
+  try {
+    const data = await api("/api/redeem-code", {
+      method: "POST",
+      body: JSON.stringify({
+        fullName: studentName,
+        accessCode: $("accessCode").value.trim().toUpperCase(),
+        mockId: selectedMockId
+      })
+    });
+
+    attemptId = data.attemptId;
+
+    await startExam();
+
+  } catch (error) {
+    $("verifyError").textContent = error.message;
+    button.disabled = false;
+    button.textContent = "Verify and Start Examination";
+  }
+});
+
+async function startExam() {
+  const data = await api(
+    "/api/exam/" + encodeURIComponent(attemptId) + "/questions"
+  );
+
+  questions = data.questions || [];
+  answers = {};
+  currentQuestion = 0;
+  remainingSeconds = data.remainingSeconds;
+
+  if (!questions.length) {
+    throw new Error("This examination has no questions.");
+  }
+
+  $("examTitle").textContent = data.title;
+  $("studentLabel").textContent = "Candidate: " + studentName;
+
+  $("mockSection").classList.add("hidden");
+  $("verifySection").classList.remove("show");
+  $("examSection").classList.add("show");
+
+  renderQuestion();
+  renderNavigation();
+  updateTimer();
+
+  timerInterval = setInterval(() => {
+    remainingSeconds--;
+    updateTimer();
+
+    if (remainingSeconds <= 0) {
+      clearInterval(timerInterval);
+      submitExam(true);
+    }
+  }, 1000);
+
+  $("examSection").scrollIntoView({behavior:"smooth"});
+}
+
+function updateTimer() {
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+
+  $("timer").textContent =
+    String(minutes).padStart(2,"0") + ":" +
+    String(seconds).padStart(2,"0");
+
+  $("timer").classList.toggle("warning", remainingSeconds <= 300);
+}
+
+function renderQuestion() {
+  const q = questions[currentQuestion];
+
+  $("questionNumber").textContent =
+    "QUESTION " + (currentQuestion + 1) + " OF " + questions.length;
+
+  $("questionText").textContent = q.questionText;
+
+  $("progressBar").style.width =
+    ((currentQuestion + 1) / questions.length * 100) + "%";
+
+  $("options").innerHTML = ["A","B","C","D"].map(letter => `
+    <label class="option ${answers[q.id] === letter ? "selected" : ""}">
+      <input type="radio" name="answer" value="${letter}"
+        ${answers[q.id] === letter ? "checked" : ""}>
+      <span><strong>${letter}.</strong> ${escapeHTML(q.options[letter])}</span>
+    </label>
+  `).join("");
+
+  $("options").querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      answers[q.id] = input.value;
+      renderQuestion();
+      renderNavigation();
+    });
+  });
+
+  $("previousBtn").disabled = currentQuestion === 0;
+  $("nextBtn").textContent =
+    currentQuestion === questions.length - 1 ? "Last Question" : "Next";
+}
+
+function renderNavigation() {
+  $("questionNav").innerHTML = questions.map((q,index) => `
+    <button
+      class="${index === currentQuestion ? "current" : ""} ${answers[q.id] ? "answered" : ""}"
+      data-index="${index}">
+      ${index + 1}
+    </button>
+  `).join("");
+
+  $("questionNav").querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => {
+      currentQuestion = Number(button.dataset.index);
+      renderQuestion();
+      renderNavigation();
+    });
+  });
+}
+
+$("previousBtn").addEventListener("click", () => {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+    renderNavigation();
+  }
+});
+
+$("nextBtn").addEventListener("click", () => {
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+    renderNavigation();
+  }
+});
+
+$("submitBtn").addEventListener("click", () => {
+  const unanswered = questions.filter(q => !answers[q.id]).length;
+
+  const message = unanswered
+    ? `You have ${unanswered} unanswered question(s). Submit anyway?`
+    : "Are you sure you want to submit your examination?";
+
+  if (confirm(message)) submitExam(false);
+});
+
+async function submitExam(autoSubmitted) {
+  if (submitting) return;
+
+  submitting = true;
+  clearInterval(timerInterval);
+
+  $("submitBtn").disabled = true;
+  $("submitBtn").textContent = "Submitting...";
+
+  try {
+    const result = await api(
+      "/api/exam/" + encodeURIComponent(attemptId) + "/submit",
+      {
+        method: "POST",
+        body: JSON.stringify({answers})
+      }
+    );
+
+    $("examSection").classList.remove("show");
+    $("resultSection").classList.remove("hidden");
+
+    $("resultScore").textContent =
+      result.score + " / " + result.totalQuestions;
+
+    $("resultMessage").textContent =
+      autoSubmitted
+        ? "Your time expired. Your examination was submitted automatically."
+        : "Your examination was submitted successfully.";
+
+    $("resultSection").scrollIntoView({behavior:"smooth"});
+
+  } catch (error) {
+    alert(error.message);
+    submitting = false;
+    $("submitBtn").disabled = false;
+    $("submitBtn").textContent = "Submit Examination";
+  }
+}
+
+loadMocks();
+</script>
+
 </body>
 </html>
