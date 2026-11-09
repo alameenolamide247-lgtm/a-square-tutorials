@@ -1,0 +1,17 @@
+name = "a-square-tutorials"
+main = "src/index.js"
+compatibility_date = "2026-11-09"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "asquaretutorials-db"
+database_id = "2428f397-8729-4faf-9043-cca89231f077"
+migrations_dir = "migrations"
+
+[observability]
+enabled = true
