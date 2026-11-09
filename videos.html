@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#073b91">
+  <meta name="description" content="Watch A² Tutorials explanatory videos and improve your understanding of key subjects.">
+  <title>A-Square Videos | A² Tutorials</title>
+
+  <style>
+    @font-face {
+      font-family: 'Moanslight';
+      src: url('./moanslight-regular.ttf') format('truetype');
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: 'Moanslight';
+      src: url('./moanslight-medium.ttf') format('truetype');
+      font-weight: 500;
+    }
+
+    @font-face {
+      font-family: 'Moanslight';
+      src: url('./moanslight-semibold.ttf') format('truetype');
+      font-weight: 600;
+    }
+
+    @font-face {
+      font-family: 'Moanslight';
+      src: url('./moanslight-bold.ttf') format('truetype');
+      font-weight: 700;
+    }
+
+    :root {
+      --blue: #0755c9;
+      --dark: #061d46;
+      --cyan: #12c5ed;
+      --light: #f2f8ff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Moanslight', sans-serif;
+      background: #f5f9ff;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 7%;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid #e5efff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(15px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--blue);
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .logo img {
+      width: 43px;
+      height: 43px;
+      object-fit: contain;
+    }
+
+    .back-link {
+      padding: 11px 21px;
+      background: linear-gradient(110deg, var(--blue), #08b9e8);
+      color: white;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: .3s;
+    }
+
+    .back-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px #0755c933;
+    }
+
+    .hero {
+      padding: 85px 7% 100px;
+      text-align: center;
+      color: white;
+      background:
+        radial-gradient(circle at 85% 15%, #12c5ed55, transparent 28%),
+        linear-gradient(125deg, #041b49, #0755c9 65%, #078fd0);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero small {
+      display: inline-block;
+      padding: 9px 17px;
+      border: 1px solid #ffffff55;
+      border-radius: 30px;
+      background: #ffffff12;
+      font-size: 11px;
+      letter-spacing: 2px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 65px);
+      letter-spacing: -1.5px;
+      margin-bottom: 17px;
+    }
+
+    .hero h1 span {
+      color: #7af0ff;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: auto;
+      color: #dcecff;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .video-section {
+      max-width: 1200px;
+      margin: auto;
+      padding: 75px 6%;
+      min-height: 350px;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-heading small {
+      color: var(--blue);
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-size: 11px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(27px, 4vw, 38px);
+      margin: 10px 0;
+    }
+
+    .section-heading p {
+      color: #718096;
+      font-size: 14px;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .video-card {
+      background: white;
+      border: 1px solid #e5edfa;
+      border-radius: 19px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px #08275b09;
+      transition: .3s ease;
+    }
+
+    .video-card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 18px 38px #0755c91a;
+      border-color: #b9dcff;
+    }
+
+    .video-top {
+      height: 145px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #062b70, #0876d5);
+      color: white;
+      font-size: 48px;
+    }
+
+    .video-content {
+      padding: 24px;
+    }
+
+    .platform {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .youtube {
+      background: #fff0f0;
+      color: #d90000;
+    }
+
+    .tiktok {
+      background: #eaf8fa;
+      color: #111827;
+    }
+
+    .video-content h3 {
+      font-size: 19px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      overflow-wrap: anywhere;
+    }
+
+    .watch-btn {
+      display: block;
+      text-align: center;
+      padding: 13px;
+      background: linear-gradient(110deg, var(--blue), #08b9e8);
+      color: white;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 13px;
+      transition: .3s;
+    }
+
+    .watch-btn:hover {
+      box-shadow: 0 8px 20px #0755c933;
+      transform: translateY(-2px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 65px 20px;
+      background: white;
+      border: 1px solid #e5edfa;
+      border-radius: 20px;
+      max-width: 650px;
+      margin: auto;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .empty-state h3 {
+      font-size: 21px;
+      margin-bottom: 10px;
+    }
+
+    .empty-state p {
+      color: #718096;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .status {
+      text-align: center;
+      color: #718096;
+      padding: 35px;
+      font-size: 14px;
+    }
+
+    footer {
+      background: #041631;
+      color: white;
+      padding: 45px 7% 25px;
+      text-align: center;
+    }
+
+    footer strong {
+      font-size: 23px;
+    }
+
+    footer p {
+      color: #c6d9f3;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-top: 10px;
+    }
+
+    .copyright {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid #ffffff20;
+      font-size: 12px;
+      color: #a9c1e0;
+    }
+
+    @media (max-width: 850px) {
+      .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 580px) {
+      .navbar {
+        padding: 15px 5%;
+      }
+
+      .logo {
+        font-size: 16px;
+        gap: 8px;
+      }
+
+      .logo img {
+        width: 35px;
+        height: 35px;
+      }
+
+      .back-link {
+        padding: 10px 15px;
+        font-size: 11px;
+      }
+
+      .hero {
+        padding: 75px 6%;
+      }
+
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .video-section {
+        padding: 60px 6%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <img src="./20261108_134629.png" alt="A² Tutorials Logo">
+      <span>A-SQUARE TUTORIALS</span>
+    </a>
+
+    <a href="index.html" class="back-link">← Back to Home</a>
+  </nav>
+
+  <header class="hero">
+    <small>LEARN • UNDERSTAND • EXCEL</small>
+    <h1>A-Square <span>Videos</span></h1>
+    <p>
+      Learn smarter with our explanatory videos.
+      Explore lessons designed to make difficult concepts
+      easier to understand and help you prepare with confidence.
+    </p>
+  </header>
+
+  <main class="video-section">
+    <div class="section-heading">
+      <small>OUR VIDEO LIBRARY</small>
+      <h2>Explore Our Lessons</h2>
+      <p>Choose a lesson and start learning.</p>
+    </div>
+
+    <div id="videoStatus" class="status">
+      Loading videos...
+    </div>
+
+    <div id="videoGrid" class="video-grid"></div>
+  </main>
+
+  <footer>
+    <strong>A² TUTORIALS</strong>
+    <p>Excellence in Learning, Success in Results</p>
+    <div class="copyright">
+      © <span id="year"></span> A² Tutorials. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+
+    const videoGrid = document.getElementById("videoGrid");
+    const videoStatus = document.getElementById("videoStatus");
+
+    function showEmptyState() {
+      videoGrid.innerHTML = "";
+
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.style.gridColumn = "1 / -1";
+
+      const icon = document.createElement("div");
+      icon.className = "empty-icon";
+      icon.textContent = "▶";
+
+      const heading = document.createElement("h3");
+      heading.textContent = "No videos available at the moment.";
+
+      const message = document.createElement("p");
+      message.textContent =
+        "Our explanatory lessons will appear here once they are published. Please check back soon.";
+
+      empty.append(icon, heading, message);
+      videoGrid.appendChild(empty);
+    }
+
+    function createVideoCard(video) {
+      const card = document.createElement("article");
+      card.className = "video-card";
+
+      const top = document.createElement("div");
+      top.className = "video-top";
+      top.textContent = "▶";
+
+      const content = document.createElement("div");
+      content.className = "video-content";
+
+      const platform = document.createElement("span");
+      platform.className =
+        "platform " +
+        (video.platform === "YouTube" ? "youtube" : "tiktok");
+      platform.textContent = video.platform;
+
+      const title = document.createElement("h3");
+      title.textContent = video.title;
+
+      const link = document.createElement("a");
+      link.className = "watch-btn";
+      link.href = video.video_url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Watch Video →";
+
+      content.append(platform, title, link);
+      card.append(top, content);
+
+      return card;
+    }
+
+    async function loadVideos() {
+      try {
+        const response = await fetch("/api/videos");
+
+        if (!response.ok) {
+          throw new Error("Unable to load videos.");
+        }
+
+        const data = await response.json();
+        const videos = Array.isArray(data.videos) ? data.videos : [];
+
+        videoStatus.style.display = "none";
+
+        if (videos.length === 0) {
+          showEmptyState();
+          return;
+        }
+
+        videoGrid.innerHTML = "";
+
+        videos.forEach(video => {
+          videoGrid.appendChild(createVideoCard(video));
+        });
+
+      } catch (error) {
+        videoStatus.textContent =
+          "Unable to load videos right now. Please refresh the page.";
+      }
+    }
+
+    loadVideos();
+  </script>
+
+</body>
+</html>
