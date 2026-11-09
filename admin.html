@@ -508,7 +508,101 @@ $("mockForm").addEventListener("submit", async event => {
     message.textContent = e.message;
   }
 });
+async function loadAccessCodes() {
+  try {
+    const d = await api("/api/admin/codes");
 
+    $("codesTable").innerHTML = d.codes.length
+      ? d.codes.map(c => {
+          const used = Boolean(c.redeemed_at);
+          const active = Number(c.is_active) === 1;
+
+          const status = used
+            ? "Used"
+            : active ? "Unused" : "Inactive";
+
+          return `
+            <tr>
+              <td>${c.id}</td>
+              <td><span class="status">${status}</span></td>
+              <td>${escapeHTML(c.full_name || "—")}</td>
+              <td>${escapeHTML(c.mock_title || "—")}</td>
+              <td>${formatDate(c.created_at)}</td>
+              <td>
+                ${!used && active
+                  ? `<button class="danger"
+                      onclick="deactivateCode(${c.id})">
+                      Deactivate
+                    </button>`
+                  : "—"}
+              </td>
+            </tr>
+          `;
+        }).join("")
+      : `<tr><td colspan="6" class="empty">No access codes generated yet.</td></tr>`;
+
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+$("generateCodesBtn").addEventListener("click", async () => {
+  const count = Number($("codeCount").value);
+
+  if (!Number.isInteger(count) || count < 1 || count > 100) {
+    alert("Enter a number between 1 and 100.");
+    return;
+  }
+
+  if (!confirm(`Generate ${count} access code(s)?`)) return;
+
+  try {
+    const result = await api("/api/admin/codes", {
+      method: "POST",
+      body: JSON.stringify({ count })
+    });
+
+    $("generatedCodes").innerHTML = `
+      <h3>Newly Generated Codes</h3>
+      <p class="muted">
+        Copy and save these codes now. They will not be displayed again.
+      </p>
+      <textarea id="newCodesList" rows="8" readonly>${result.codes.join("\n")}</textarea>
+      <button class="secondary" id="copyCodesBtn">
+        Copy All Codes
+      </button>
+    `;
+
+    $("copyCodesBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(result.codes.join("\n"));
+      alert("Codes copied successfully.");
+    });
+
+    loadAccessCodes();
+    loadOverview();
+
+  } catch (e) {
+    alert(e.message);
+  }
+});
+
+async function deactivateCode(id) {
+  if (!confirm("Deactivate this unused access code?")) return;
+
+  try {
+    await api("/api/admin/codes/" + id, {
+      method: "PATCH",
+      body: JSON.stringify({ is_active: 0 })
+    });
+
+    loadAccessCodes();
+    loadOverview();
+
+    alert("Access code deactivated.");
+  } catch (e) {
+    alert(e.message);
+  }
+}
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
 
