@@ -998,7 +998,7 @@ async function createResultCard() {
   ctx.arc(100, 1500, 260, 0, Math.PI * 2);
   ctx.stroke();
 
-      // Header Logo and Brand Name
+            // Header Logo and Brand Name
   const logo = new Image();
   logo.src = "20261108_134629.png";
 
@@ -1007,21 +1007,40 @@ async function createResultCard() {
     logo.onerror = reject;
   });
 
+  ctx.font = "bold 65px Moanslight, Arial";
+  const brandWidth = ctx.measureText("A-SQUARE").width;
+
+  const logoSize = 140;
+  const gap = 25;
+  const groupWidth = logoSize + gap + brandWidth;
+  const groupX = (1200 - groupWidth) / 2;
+  const textX = groupX + logoSize + gap;
+
+  // Logo
   ctx.save();
   ctx.beginPath();
-  ctx.roundRect(300, 55, 150, 150, 25);
+  ctx.roundRect(groupX, 65, logoSize, logoSize, 25);
   ctx.clip();
-  ctx.drawImage(logo, 300, 55, 150, 150);
+  ctx.drawImage(logo, groupX, 65, logoSize, logoSize);
   ctx.restore();
 
+  // A-SQUARE
   ctx.textAlign = "left";
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 65px Moanslight, Arial";
-  ctx.fillText("A-SQUARE", 480, 125);
+  ctx.fillText("A-SQUARE", textX, 125);
 
+  // TUTORIALS — same width as A-SQUARE
   ctx.fillStyle = "#75e5ff";
   ctx.font = "42px Moanslight, Arial";
-  ctx.fillText("TUTORIALS", 480, 180);
+  const tutorialsWidth = ctx.measureText("TUTORIALS").width;
+  const tutorialsFontSize = 42 * (brandWidth / tutorialsWidth);
+
+  ctx.font = `${tutorialsFontSize}px Moanslight, Arial`;
+  ctx.fillText("TUTORIALS", textX, 180);
+
+  // Centre-aligned tagline
+  ctx.textAlign = "center";
 
   ctx.textAlign = "center";
   ctx.fillStyle = "#dceeff";
