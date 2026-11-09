@@ -1052,6 +1052,32 @@ $("mockForm").addEventListener("submit", async event => {
     alert(e.message);
   }
 });
+ async function toggleVideo(id, status) {
+  try {
+    const d = await api("/api/admin/videos");
+    const video = d.videos.find(v => v.id === id);
+
+    if (!video) {
+      alert("Video not found.");
+      return;
+    }
+
+    await api("/api/admin/videos/" + id, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: video.title,
+        video_url: video.video_url,
+        platform: video.platform,
+        is_published: status
+      })
+    });
+
+    loadVideos();
+
+  } catch (e) {
+    alert(e.message);
+  }
+     }
 async function loadAccessCodes() {
   try {
     const d = await api("/api/admin/codes");
