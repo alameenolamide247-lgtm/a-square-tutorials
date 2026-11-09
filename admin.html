@@ -976,6 +976,50 @@ $("mockForm").addEventListener("submit", async event => {
     message.textContent = e.message;
   }
 });
+ async function loadVideos() {
+  try {
+    const d = await api("/api/admin/videos");
+
+    $("videosTable").innerHTML = d.videos.length
+      ? d.videos.map(video => `
+          <tr>
+            <td>${escapeHTML(video.title)}</td>
+            <td>${escapeHTML(video.platform)}</td>
+            <td>
+              <span class="status">
+                ${Number(video.is_published) === 1
+                  ? "Published"
+                  : "Unpublished"}
+              </span>
+            </td>
+            <td>
+              <button class="secondary"
+                onclick="toggleVideo('${video.id}', ${Number(video.is_published) === 1 ? 0 : 1})">
+                ${Number(video.is_published) === 1
+                  ? "Unpublish"
+                  : "Publish"}
+              </button>
+
+              <button class="primary"
+                onclick="editVideo('${video.id}')">
+                Edit
+              </button>
+
+              <button class="danger"
+                onclick="deleteVideo('${video.id}')">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `).join("")
+      : `<tr><td colspan="4" class="empty">
+          No videos added yet.
+        </td></tr>`;
+
+  } catch (e) {
+    alert(e.message);
+  }
+ }
 async function loadAccessCodes() {
   try {
     const d = await api("/api/admin/codes");
