@@ -679,6 +679,7 @@ async function loadMocks() {
     list.querySelectorAll("button[data-mock-id]").forEach(button => {
       button.addEventListener("click", () => {
         selectedMockId = button.dataset.mockId;
+        currentMockTitle = button.dataset.mockTitle;
         $("selectedMock").textContent =
           "Selected examination: " + button.dataset.mockTitle;
 
