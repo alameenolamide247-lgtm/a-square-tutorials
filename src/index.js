@@ -426,7 +426,7 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
 
         // Activate or deactivate an unused code
         const codeMatch = url.pathname.match(
-          /^\\/api\\/admin\\/codes\\/(\\d+)$/
+          /^\/api\/admin\/codes\/(\d+)$/
         );
 
         if (codeMatch && method === "PATCH") {
