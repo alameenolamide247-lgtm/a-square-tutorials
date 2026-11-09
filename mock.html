@@ -735,6 +735,7 @@ async function startExam() {
   }
 
   $("examTitle").textContent = data.title;
+  currentMockTitle = data.title;
   $("studentLabel").textContent = "Candidate: " + studentName;
 
   $("mockSection").classList.add("hidden");
