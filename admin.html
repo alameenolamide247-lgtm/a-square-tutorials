@@ -695,6 +695,7 @@ async function createAdminResultCard(r) {
 async function loadResults() {
   try {
     const d = await api("/api/admin/results");
+   adminResults = d.results;
     $("resultsTable").innerHTML = d.results.length ? d.results.map(r => {
       const total = Number(r.total_questions) || 0;
       const score = Number(r.score);
