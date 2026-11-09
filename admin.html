@@ -94,6 +94,184 @@ th{color:#6d7b91;background:#f8faff}
  .form-grid,.question-card .options-grid{grid-template-columns:1fr}
  .top{align-items:flex-start}
 }
+ /* PREMIUM A² ADMIN DASHBOARD */
+
+body {
+  background: #f2f6ff;
+  background-image: radial-gradient(#dce8ff 0.7px, transparent 0.7px);
+  background-size: 22px 22px;
+}
+
+/* Sidebar */
+.sidebar {
+  background: linear-gradient(160deg, #071b42, #103d80 65%, #087eae);
+  box-shadow: 8px 0 30px rgba(5, 30, 75, 0.12);
+}
+
+.brand {
+  letter-spacing: -0.5px;
+  border-bottom: 1px solid #ffffff20;
+  margin-bottom: 22px;
+}
+
+.nav button {
+  padding: 13px 15px;
+  border-radius: 11px;
+  transition: all 0.25s ease;
+  font-size: 14px;
+}
+
+.nav button.active {
+  background: linear-gradient(100deg, #087ee8, #12c5e8);
+  color: white;
+  box-shadow: 0 5px 18px #08a8e844;
+}
+
+.nav button:hover:not(.active) {
+  background: #ffffff18;
+  transform: translateX(3px);
+}
+
+/* Main dashboard */
+.main {
+  padding: 35px;
+}
+
+.top h1 {
+  color: #102e63;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+}
+
+/* Dashboard cards */
+.stat, .panel {
+  border: 1px solid #e5edfa;
+  border-radius: 17px;
+  box-shadow: 0 8px 28px rgba(20, 55, 110, 0.055);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.stat:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 13px 30px #163d7618;
+}
+
+.stat strong {
+  color: #0878d9;
+  font-size: 32px;
+}
+
+.panel {
+  padding: 24px;
+}
+
+.panel h2 {
+  color: #123b83;
+  font-weight: 700;
+}
+
+/* Buttons */
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+}
+
+.primary {
+  background: linear-gradient(110deg, #087ee8, #12c5e8);
+  color: white;
+  box-shadow: 0 5px 14px #078ce533;
+}
+
+.secondary {
+  border: 1px solid #d8e6fa;
+}
+
+/* Inputs */
+input, textarea, select {
+  border: 1px solid #d8e3f3;
+  border-radius: 11px;
+  padding: 13px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #0b9ee8;
+  box-shadow: 0 0 0 3px #0b9ee81c;
+}
+
+/* Tables */
+table {
+  border-spacing: 0;
+}
+
+th {
+  background: #f0f6ff;
+  color: #17447e;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 15px 13px;
+}
+
+tbody tr:hover {
+  background: #f5f9ff;
+}
+
+/* Status labels */
+.status {
+  font-weight: 600;
+  padding: 6px 11px;
+}
+
+/* Question cards */
+.question-card {
+  border: 1px solid #dce8fa;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px #163d7609;
+}
+
+/* Login screen */
+.login-wrap {
+  background: linear-gradient(135deg, #071b42, #104b91, #08a8d5);
+}
+
+.login-box {
+  border-radius: 22px;
+  padding: 38px;
+  box-shadow: 0 25px 70px #00133155;
+}
+
+.login-box h1 {
+  font-size: 30px;
+}
+
+/* Mobile refinement */
+@media(max-width:650px) {
+  .main {
+    padding: 15px;
+  }
+
+  .panel {
+    padding: 17px;
+  }
+
+  .sidebar {
+    box-shadow: 0 5px 20px #071b4220;
+  }
+
+  .nav button {
+    padding: 11px 13px;
+  }
+}
 </style>
 </head>
 
