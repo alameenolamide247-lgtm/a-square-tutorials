@@ -214,6 +214,41 @@ th{color:#6d7b91;background:#f8faff}
     </div>
   </section>
 
+   <section class="page" id="codes">
+    <div class="panel">
+      <h2>Generate Access Codes</h2>
+      <p class="muted">Create single-use codes for students to access mock examinations.</p>
+
+      <label>Number of codes to generate</label>
+      <input id="codeCount" type="number" min="1" max="100" value="10">
+
+      <button class="primary" id="generateCodesBtn">
+        Generate Codes
+      </button>
+
+      <div id="generatedCodes" style="margin-top:20px"></div>
+    </div>
+
+    <div class="panel">
+      <h2>All Access Codes</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Status</th>
+              <th>Student</th>
+              <th>Mock</th>
+              <th>Created</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="codesTable"></tbody>
+        </table>
+      </div>
+    </div>
+   </section>
+
 </main>
 </div>
 
