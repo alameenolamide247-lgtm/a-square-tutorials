@@ -547,6 +547,63 @@ if (examSubmitMatch && method === "POST") {
     message: "Your examination has been marked successfully."
   });
 }
+      // Review examination answers after submission
+const examReviewMatch = url.pathname.match(
+  /^\/api\/exam\/([^/]+)\/review$/
+);
+
+if (examReviewMatch && method === "GET") {
+  const attemptId = examReviewMatch[1];
+
+  const attempt = await env.DB.prepare(`
+    SELECT id, status
+    FROM attempts
+    WHERE id = ?
+  `).bind(attemptId).first();
+
+  if (!attempt) {
+    return json({ error: "Examination not found." }, 404);
+  }
+
+  if (!["submitted", "expired"].includes(attempt.status)) {
+    return json({
+      error: "You can only review an examination after submission."
+    }, 403);
+  }
+
+  const result = await env.DB.prepare(`
+    SELECT
+      q.id,
+      q.question_text,
+      q.options_json,
+      q.correct_option,
+      q.explanation,
+      a.selected_option
+    FROM questions q
+    LEFT JOIN answers a
+      ON a.question_id = q.id
+      AND a.attempt_id = ?
+    WHERE q.mock_id = (
+      SELECT mock_id FROM attempts WHERE id = ?
+    )
+    ORDER BY q.sort_order ASC
+  `).bind(attemptId, attemptId).all();
+
+  const reviews = (result.results || []).map(q => ({
+    questionId: q.id,
+    questionText: q.question_text,
+    options: JSON.parse(q.options_json),
+    selectedOption: q.selected_option,
+    correctOption: q.correct_option,
+    explanation: q.explanation,
+    isCorrect: q.selected_option === q.correct_option
+  }));
+
+  return json({
+    ok: true,
+    reviews
+  });
+}
       // Test database connection
       if (url.pathname === "/api/health" && method === "GET") {
         if (!env.DB) {
