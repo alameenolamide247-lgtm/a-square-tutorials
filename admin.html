@@ -73,14 +73,37 @@
 
   <script>
     document.getElementById("loginForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
+  event.preventDefault();
 
-      const message = document.getElementById("message");
-      message.textContent = "Admin sign-in will be connected in the next step.";
+  const message = document.getElementById("message");
+  const password = document.getElementById("password").value;
 
-      // Authentication will be handled securely by the server.
-      // Do not put the admin password or secret in this file.
+  message.textContent = "Checking password...";
+
+  try {
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "same-origin",
+      body: JSON.stringify({ password })
     });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      message.textContent = result.error || "Login failed.";
+      return;
+    }
+
+    message.textContent = "Login successful!";
+    window.location.href = "/admin.html?authenticated=1";
+
+  } catch (error) {
+    message.textContent = "Connection error. Please try again.";
+  }
+});
   </script>
 </body>
 </html>
