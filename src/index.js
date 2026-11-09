@@ -355,12 +355,113 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
             LIMIT 500
           `).all();
 
-          return json({ results: result.results || [] });
+                    return json({ results: result.results || [] });
+        }
+
+        // Generate access codes
+        if (url.pathname === "/api/admin/codes" && method === "POST") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const count = Number(body.count);
+
+          if (!Number.isInteger(count) || count < 1 || count > 100) {
+            return json({ error: "Generate between 1 and 100 codes." }, 400);
+          }
+
+          const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+          const generated = [];
+          const statements = [];
+
+          for (let i = 0; i < count; i++) {
+            const bytes = crypto.getRandomValues(new Uint8Array(12));
+            let randomPart = "";
+
+            for (const byte of bytes) {
+              randomPart += alphabet[byte % alphabet.length];
+            }
+
+            const code = "ASQ-" + randomPart;
+            generated.push(code);
+
+            statements.push(
+              env.DB.prepare(`
+                INSERT INTO access_codes (code_hash, is_active)
+                VALUES (?, 1)
+              `).bind(await sha256(code))
+            );
+          }
+
+          await env.DB.batch(statements);
+
+          return json({ ok: true, codes: generated }, 201);
+        }
+
+        // List access codes
+        if (url.pathname === "/api/admin/codes" && method === "GET") {
+          const result = await env.DB.prepare(`
+            SELECT
+              ac.id,
+              ac.is_active,
+              ac.created_at,
+              ac.redeemed_at,
+              s.full_name,
+              m.title AS mock_title
+            FROM access_codes ac
+            LEFT JOIN students s
+              ON s.id = ac.redeemed_by_student_id
+            LEFT JOIN mocks m
+              ON m.id = ac.redeemed_for_mock_id
+            ORDER BY ac.created_at DESC
+            LIMIT 500
+          `).all();
+
+          return json({ codes: result.results || [] });
+        }
+
+        // Activate or deactivate an unused code
+        const codeMatch = url.pathname.match(
+          /^\\/api\\/admin\\/codes\\/(\\d+)$/
+        );
+
+        if (codeMatch && method === "PATCH") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const isActive = Number(body.is_active);
+
+          if (![0, 1].includes(isActive)) {
+            return json({ error: "Invalid code status." }, 400);
+          }
+
+          const result = await env.DB.prepare(`
+            UPDATE access_codes
+            SET is_active = ?
+            WHERE id = ?
+              AND redeemed_at IS NULL
+          `).bind(isActive, Number(codeMatch[1])).run();
+
+          if (!result.meta?.changes) {
+            return json({
+              error: "Code not found or already redeemed."
+            }, 400);
+          }
+
+          return json({ ok: true });
         }
       }
       // ==========================================
-// STUDENT CBT EXAMINATION API
-// ==========================================
+      // STUDENT CBT EXAMINATION API
 
 // Load questions for an active examination
 const examQuestionsMatch = url.pathname.match(
