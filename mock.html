@@ -475,7 +475,72 @@ async function submitExam(autoSubmitted) {
     $("submitBtn").textContent = "Submit Examination";
   }
 }
+async function loadReview() {
+  const button = $("reviewBtn");
+  const section = $("reviewSection");
+  const list = $("reviewList");
 
+  button.disabled = true;
+  button.textContent = "Loading answers...";
+
+  try {
+    const data = await api(
+      "/api/exam/" + encodeURIComponent(attemptId) + "/review"
+    );
+
+    list.innerHTML = data.reviews.map((item, index) => {
+      const selected = item.selectedOption
+        ? item.selectedOption.toUpperCase()
+        : null;
+
+      const correct = item.correctOption.toUpperCase();
+      const isCorrect = selected === correct;
+
+      return `
+        <div class="panel" style="margin-top:18px">
+          <p class="question-number">QUESTION ${index + 1}</p>
+
+          <p class="question-text">
+            ${escapeHTML(item.questionText)}
+          </p>
+
+          <p style="color:${isCorrect ? "#087443" : "#b42318"};font-weight:700">
+            ${isCorrect ? "Correct answer" : "Incorrect answer"}
+          </p>
+
+          <p style="margin-top:10px;font-size:14px">
+            Your answer:
+            <strong>${selected || "Not answered"}</strong>
+          </p>
+
+          <p style="margin-top:7px;font-size:14px">
+            Correct answer:
+            <strong>${correct}. ${escapeHTML(item.options[correct])}</strong>
+          </p>
+
+          ${item.explanation ? `
+            <div class="notice">
+              <strong>Explanation:</strong><br>
+              ${escapeHTML(item.explanation)}
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }).join("");
+
+    section.classList.remove("hidden");
+    section.scrollIntoView({behavior:"smooth"});
+
+    button.textContent = "Answers Loaded";
+
+  } catch (error) {
+    alert(error.message);
+    button.disabled = false;
+    button.textContent = "Review My Answers";
+  }
+}
+
+$("reviewBtn").addEventListener("click", loadReview);
 loadMocks();
 </script>
 
