@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#073b91">
+  <meta name="description" content="A² Tutorials UTME mock examination portal.">
+  <title>Mock Portal | A² Tutorials</title>
+  <style>
+    @font-face{font-family:Moanslight;src:url('./moanslight-regular.ttf') format('truetype');font-weight:400}
+    @font-face{font-family:Moanslight;src:url('./moanslight-medium.ttf') format('truetype');font-weight:500}
+    @font-face{font-family:Moanslight;src:url('./moanslight-semibold.ttf') format('truetype');font-weight:600}
+    @font-face{font-family:Moanslight;src:url('./moanslight-bold.ttf') format('truetype');font-weight:700}
+    :root{--blue:#0755c9;--dark:#08275b;--cyan:#12c5ed;--muted:#64748b;--line:#dce8f5}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Moanslight,Arial,sans-serif;background:#f7faff;color:var(--dark);min-height:100vh}
+    a{text-decoration:none;color:inherit}
+    .topbar{background:#fff;border-bottom:1px solid var(--line);padding:16px max(5%,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{font-size:23px;font-weight:700;color:var(--blue)}.brand span{color:var(--cyan)}
+    .back{font-size:14px;font-weight:600;color:var(--blue)}
+    .hero{background:radial-gradient(circle at 85% 10%,#12c5ed55,transparent 30%),linear-gradient(120deg,#062b70,#0755c9 68%,#078fd0);color:white;padding:58px 5% 66px;text-align:center}
+    .eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:#bcefff;margin-bottom:13px}
+    h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:13px}
+    .hero p{color:#e1efff;line-height:1.7;max-width:620px;margin:auto;font-size:15px}
+    main{max-width:1050px;margin:0 auto;padding:42px 20px 70px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px}
+    h2{font-size:24px}.sub{color:var(--muted);font-size:14px;margin-top:5px}
+    .status{font-size:12px;font-weight:700;background:#e8f5ff;color:var(--blue);padding:8px 11px;border-radius:30px}
+    .empty,.mock-card,.verify{background:white;border:1px solid var(--line);border-radius:17px;box-shadow:0 8px 28px #08275b08}
+    .empty{text-align:center;padding:48px 20px}
+    .empty-icon{width:62px;height:62px;border-radius:18px;background:#eaf5ff;color:var(--blue);display:grid;place-items:center;font-size:28px;margin:0 auto 17px}
+    .empty h3{font-size:19px;margin-bottom:8px}.empty p{font-size:14px;color:var(--muted);line-height:1.7;max-width:440px;margin:auto}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+    .mock-card{padding:22px;display:flex;flex-direction:column;gap:15px}
+    .available{font-size:11px;color:#087443;background:#e7f8ef;padding:6px 9px;border-radius:20px;font-weight:700}
+    .mock-card h3{font-size:19px}.details{display:grid;gap:10px}
+    .detail{display:flex;justify-content:space-between;gap:12px;font-size:13px}.detail span{color:var(--muted)}.detail strong{text-align:right}
+    button,.primary{border:0;border-radius:9px;background:var(--blue);color:#fff;font:600 14px Moanslight,Arial,sans-serif;padding:13px 18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;min-height:46px}
+    button:hover,.primary:hover{background:#0646a8}.primary{width:100%}
+    .verify{max-width:500px;margin:30px auto 0;padding:25px;display:none}
+    .verify.show{display:block}.verify h3{font-size:21px;margin-bottom:7px}.verify .hint{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:20px}
+    label{display:block;font-size:13px;font-weight:600;margin:15px 0 7px}
+    input{width:100%;padding:13px 14px;border:1px solid #cad8e8;border-radius:9px;font:14px Moanslight,Arial,sans-serif;outline:none}
+    input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #0755c918}
+    .verify button{width:100%;margin-top:17px}.error{display:none;color:#b42318;background:#fff0ee;border:1px solid #ffd3ce;border-radius:9px;padding:11px 12px;font-size:13px;margin-top:14px;line-height:1.5}
+    .error.show{display:block}.wa{display:none;background:#12834b;color:white;width:100%;margin-top:10px}.wa.show{display:flex}.wa:hover{background:#0d6e3e}
+    .foot{text-align:center;color:#8392a7;font-size:12px;padding:25px 15px 35px}
+    .notice{font-size:12px;color:var(--muted);line-height:1.6;margin-top:17px;text-align:center}
+    @media(max-width:600px){.hero{padding:46px 6% 52px}main{padding:30px 15px 55px}.section-head{align-items:start;flex-direction:column}.verify{padding:20px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./index.html">A² <span>TUTORIALS</span></a>
+    <a class="back" href="./index.html">← Back to website</a>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">EXCELLENCE IN LEARNING, SUCCESS IN RESULTS</div>
+    <h1>Mock Examination Portal</h1>
+    <p>Challenge yourself, practise under timed conditions and build confidence for your UTME examinations.</p>
+  </section>
+
+  <main>
+    <div class="section-head">
+      <div>
+        <h2>Available Mock Examinations</h2>
+        <p class="sub">Select a mock to view its details and verify your access code.</p>
+      </div>
+      <span class="status" id="mock-count">0 mocks available</span>
+    </div>
+
+    <div id="mock-list" class="grid" aria-live="polite">
+      <div class="empty" style="grid-column:1/-1">
+        <div class="empty-icon">▤</div>
+        <h3>No Available Mocks</h3>
+        <p>There are currently no mock examinations available. Please check back later.</p>
+      </div>
+    </div>
+
+    <section class="verify" id="verify-panel">
+      <h3>Student verification</h3>
+      <p class="hint" id="selected-mock">Enter your details to continue to the examination.</p>
+      <form id="verify-form">
+        <input type="hidden" id="mock-id">
+        <label for="student-name">Full name</label>
+        <input id="student-name" name="studentName" autocomplete="name" maxlength="100" placeholder="Enter your full name" required>
+        <label for="access-code">Access code</label>
+        <input id="access-code" name="accessCode" autocomplete="off" autocapitalize="characters" maxlength="40" placeholder="Enter your active code" required>
+        <button id="verify-button" type="submit">Verify and continue</button>
+        <div class="error" id="error-message" role="alert"></div>
+        <a class="primary wa" id="whatsapp-link" href="#" target="_blank" rel="noopener">Chat on WhatsApp to get a code</a>
+      </form>
+      <p class="notice">Each access code can be used once only. After successful verification, it cannot be used for another mock.</p>
+    </section>
+  </main>
+
+  <footer class="foot">© 2026 A² Tutorials. All rights reserved.</footer>
+
+  <script>
+    /*
+      FRONT-END PHASE ONLY:
+      No mocks are published yet, so this page intentionally shows the empty state.
+      Code verification must be connected to the Cloudflare Worker + D1 backend
+      before accepting real students or real access codes.
+    */
+    const whatsappMessage = 'Hello A² Tutorials, I want to get an access code for the UTME mock examination.';
+    document.getElementById('whatsapp-link').href =
+      'https://wa.me/2347045865800?text=' + encodeURIComponent(whatsappMessage);
+
+    // The API integration will be added with the secure backend in the next phase.
+    // Never validate access codes in browser-only JavaScript.
+  </script>
+</body>
+</html>
