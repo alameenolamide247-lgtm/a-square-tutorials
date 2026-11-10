@@ -797,6 +797,9 @@ async function loadPaidMocks() {
   <button class="primary" onclick="setPaidMockStatus('${m.id}', '${m.status === "published" ? "draft" : "published"}')">
     ${m.status === "published" ? "Unpublish" : "Publish"}
   </button>
+  <button class="primary" onclick="setPaidMockResults('${m.id}', ${m.results_released ? 0 : 1})">
+    ${m.results_released ? "Hide Results" : "Release Results"}
+  </button>
 </td>
 
               </tr>
