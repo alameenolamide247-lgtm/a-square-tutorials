@@ -876,15 +876,9 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
         }
 
         if (Date.now() >= new Date(attempt.deadline_at).getTime()) {
-          await env.DB.prepare(`
-            UPDATE paid_mock_attempts
-            SET status = 'expired',
-                submitted_at = datetime('now')
-            WHERE id = ?
-              AND status = 'in_progress'
-          `).bind(attemptId).run();
+  await finalizeExpiredPaidAttempt(env, attemptId, attempt.mock_id);
 
-          return json({ error: "Your examination time has expired." }, 410);
+  return json({ error: "Your examination time has expired." }, 410);
         }
 
         const question = await env.DB.prepare(`
