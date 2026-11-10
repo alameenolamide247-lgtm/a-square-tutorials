@@ -653,6 +653,41 @@ async function loadPaidMocks() {
     panel.hidden = false;
   }
 }
+    document.addEventListener("click", async event => {
+  const button = event.target.closest(".start-paid-mock");
+
+  if (!button) return;
+
+  const mockId = button.dataset.mockId;
+
+  button.disabled = true;
+  button.textContent = "Starting Mock...";
+
+  try {
+    const response = await fetch("/api/paid/mocks/start", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ mockId })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Unable to start this mock.");
+    }
+
+    location.href =
+      `./paid-exam.html?attempt=${encodeURIComponent(result.attemptId)}`;
+
+  } catch (error) {
+    alert(error.message);
+    button.disabled = false;
+    button.textContent = "Start Mock";
+  }
+});
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
