@@ -806,6 +806,32 @@ async function loadPaidMocks() {
     list.textContent = e.message;
   }
 }
+ let selectedPaidMockId = "";
+
+async function loadPaidQuestionSubjects(mockId) {
+  try {
+    selectedPaidMockId = mockId;
+
+    const data = await api(`/api/admin/paid-mocks/${mockId}/subjects`);
+    const select = $("paidQuestionSubject");
+
+    select.innerHTML = data.subjects.map(subject => `
+      <option value="${subject.id}">${escapeHTML(subject.subject_name)}</option>
+    `).join("");
+
+    $("paidQuestionPanel").style.display = "block";
+    $("paidQuestionStatus").textContent =
+      "Select a subject and enter its questions.";
+
+    $("paidQuestionPanel").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } catch (error) {
+    alert(error.message);
+  }
+ }
  
  $("createPaidMockBtn").addEventListener("click", async () => {
   const title = $("paidMockTitle").value.trim();
