@@ -768,6 +768,7 @@ async function loadPaidMocks() {
     list.innerHTML = d.mocks.length
       ? `
         
+
 list.innerHTML = d.mocks.length
   ? `
     <table>
@@ -803,7 +804,6 @@ list.innerHTML = d.mocks.length
   `
   : "<p class='muted'>No paid mocks created yet.</p>";
   
-
   } catch (e) {
     status.textContent = "Unable to load paid mocks.";
     list.textContent = e.message;
