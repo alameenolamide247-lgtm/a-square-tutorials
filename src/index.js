@@ -918,11 +918,10 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
 
         await env.DB.batch(statements);
 
-        return json({
+                return json({
           ok: true,
           status: expired ? "expired" : "submitted",
-          score,
-          totalQuestions: questions.length
+          message: "Your examination has been submitted."
         });
       }
             // PAID STUDENT ANNOUNCEMENTS
