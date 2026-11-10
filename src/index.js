@@ -1059,6 +1059,55 @@ if (url.pathname === "/api/admin/paid-mocks" && method === "GET") {
 
   return json({ subjects: result.results || [] });
         }
+        
+if (
+  url.pathname.match(/^\/api\/admin\/paid-mocks\/[^/]+\/status$/) &&
+  method === "PATCH"
+) {
+  const mockId = url.pathname.split("/")[5];
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request." }, 400);
+  }
+
+  const status = String(body.status || "");
+
+  if (!["draft", "published", "archived"].includes(status)) {
+    return json({ error: "Invalid status." }, 400);
+  }
+
+  const mock = await env.DB.prepare(`
+    SELECT id FROM paid_mocks WHERE id = ?
+  `).bind(mockId).first();
+
+  if (!mock) {
+    return json({ error: "Paid mock not found." }, 404);
+  }
+
+  if (status === "published") {
+    const questionCount = await env.DB.prepare(`
+      SELECT COUNT(*) AS total
+      FROM paid_mock_questions
+      WHERE mock_id = ?
+    `).bind(mockId).first();
+
+    if (!questionCount || questionCount.total < 1) {
+      return json({
+        error: "Add at least one question before publishing."
+      }, 400);
+    }
+  }
+
+  await env.DB.prepare(`
+    UPDATE paid_mocks SET status = ? WHERE id = ?
+  `).bind(status, mockId).run();
+
+  return json({ ok: true, status });
+}
+        
         if (url.pathname === "/api/admin/paid-mock-questions" && method === "POST") {
   let body;
 
