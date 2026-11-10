@@ -169,7 +169,7 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           return json({ error: "Enter a valid email address." }, 400);
         }
 
-        if (!/^ASQP-[A-HJ-NP-Z2-9]{32}$/.test(studentCode)) {
+        if (!/^ASQP-[A-HJ-NP-Z2-9]{16}$/.test(studentCode)) {
           return json({ error: "Invalid Student ID." }, 400);
         }
 
@@ -271,7 +271,7 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
         if (
           email.length > 254 ||
           !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-          !/^ASQP-[A-HJ-NP-Z2-9]{32}$/.test(studentCode)
+          !/^ASQP-[A-HJ-NP-Z2-9]{16}$/.test(studentCode)
         ) {
           return json({ error: "Invalid email or Student ID." }, 400);
         }
