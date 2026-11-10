@@ -577,7 +577,69 @@ async function loadAnnouncements() {
     $("announcementsPanel").hidden = false;
   }
 }
+async function loadPaidMocks() {
+  const container = $("paidMocksList");
+  const panel = $("paidMocksPanel");
 
+  try {
+    const response = await fetch("/api/paid/mocks", {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Unable to load paid mocks.");
+    }
+
+    const mocks = result.mocks || [];
+
+    if (mocks.length === 0) {
+      container.innerHTML =
+        '<p class="muted">No published paid mocks available yet.</p>';
+    } else {
+      container.innerHTML = mocks.map(mock => {
+        let status = "Not started";
+
+        if (mock.attempt_status === "in_progress") {
+          status = "In progress";
+        } else if (
+          mock.attempt_status === "submitted" ||
+          mock.attempt_status === "expired"
+        ) {
+          status = "Completed";
+        }
+
+        const date = mock.scheduled_date
+          ? new Date(mock.scheduled_date).toLocaleDateString()
+          : "Date to be announced";
+
+        return `
+          <article style="padding:16px 0;border-bottom:1px solid #e0e9f5;">
+            <h3>${escapeHtml(mock.title)}</h3>
+            <p class="muted">Date: ${escapeHtml(date)}</p>
+            <p class="muted">Duration: ${Number(mock.duration_minutes) || 0} minutes</p>
+            <p class="muted">Subjects: ${Number(mock.subject_count) || 0}</p>
+            <p class="muted">Questions: ${Number(mock.question_count) || 0}</p>
+            <p><strong>Status:</strong> ${status}</p>
+            ${
+              mock.score !== null && mock.score !== undefined
+                ? `<p><strong>Score:</strong> ${Number(mock.score)} / ${Number(mock.total_questions) || 0}</p>`
+                : ""
+            }
+          </article>
+        `;
+      }).join("");
+    }
+
+    panel.hidden = false;
+
+  } catch (error) {
+    container.textContent = error.message;
+    panel.hidden = false;
+  }
+}
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
