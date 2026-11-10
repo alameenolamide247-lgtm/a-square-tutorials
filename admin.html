@@ -1050,6 +1050,83 @@ $("mockForm").addEventListener("submit", async event => {
     message.textContent = e.message;
   }
 });
+ 
+async function loadPaidIds() {
+  try {
+    const d = await api("/api/admin/paid-student-ids");
+
+    $("paidIdsTable").innerHTML = d.ids.length
+      ? d.ids.map(item => {
+          const expired = item.expires_at &&
+            item.expires_at < new Date().toISOString().slice(0, 10);
+
+          const active = Number(item.is_active) === 1 && !expired;
+
+          return `
+            <tr>
+              <td>${escapeHTML(item.id)}</td>
+              <td>${active ? "Active" : expired ? "Expired" : "Inactive"}</td>
+              <td>${escapeHTML(item.expires_at || "No expiry")}</td>
+              <td>${escapeHTML(item.redeemed_by_email || "Not registered")}</td>
+              <td>
+                <button class="${active ? "danger" : "primary"}"
+                  onclick="togglePaidId('${item.id}', ${active ? 0 : 1})">
+                  ${active ? "Deactivate" : "Activate"}
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("")
+      : `<tr><td colspan="5">No Student IDs generated yet.</td></tr>`;
+
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function togglePaidId(id, status) {
+  try {
+    await api("/api/admin/paid-student-ids/" + id, {
+      method: "PATCH",
+      body: JSON.stringify({ is_active: status })
+    });
+
+    await loadPaidIds();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+$("generatePaidIdsBtn").addEventListener("click", async () => {
+  const count = Number($("paidIdCount").value);
+  const expiresAt = $("paidIdExpiry").value || null;
+
+  try {
+    const d = await api("/api/admin/paid-student-ids", {
+      method: "POST",
+      body: JSON.stringify({ count, expiresAt })
+    });
+
+    $("generatedPaidIds").innerHTML = `
+      <h3>New Student IDs</h3>
+      <p>Copy and save these IDs. They will not be shown again.</p>
+      <textarea id="newPaidIds" rows="8" readonly>${d.ids.join("\n")}</textarea>
+      <button class="primary" type="button" id="copyPaidIdsBtn">
+        Copy All IDs
+      </button>
+    `;
+
+    $("copyPaidIdsBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(d.ids.join("\n"));
+      alert("Student IDs copied.");
+    });
+
+    await loadPaidIds();
+  } catch (e) {
+    alert(e.message);
+  }
+});
+ 
  async function loadVideos() {
   try {
     const d = await api("/api/admin/videos");
