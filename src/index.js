@@ -1035,7 +1035,7 @@ if (Date.now() >= deadline) {
                 total_questions = ?
             WHERE id = ?
               AND status = 'in_progress'
-                  ).bind(
+                            `).bind(
             "submitted",
             score,
             questions.length,
