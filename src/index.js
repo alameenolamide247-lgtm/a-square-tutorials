@@ -80,6 +80,33 @@ async function verifyAdminSession(request, password) {
     encoder.encode(parts[0])
   );
 }
+
+async function getPaidStudent(request, env) {
+  if (!env.DB) return null;
+
+  const cookie = request.headers.get("Cookie") || "";
+  const match = cookie.match(/(?:^|;\s*)asq_paid_session=([a-f0-9]{64})/);
+
+  if (!match) return null;
+
+  const sessionHash = await sha256(match[1]);
+
+  return await env.DB.prepare(`
+    SELECT s.id, s.full_name, s.email, s.profile_picture_url,
+           s.subjects_json, s.dream_score, s.aspiring_course,
+           s.aspiring_university, s.profile_completed
+    FROM paid_student_sessions ps
+    JOIN paid_students s ON s.id = ps.student_id
+    JOIN paid_student_ids i ON i.id = s.student_id_id
+    WHERE ps.session_hash = ?
+      AND ps.revoked_at IS NULL
+      AND ps.expires_at > datetime('now')
+      AND i.is_active = 1
+      AND (i.expires_at IS NULL OR i.expires_at >= date('now'))
+    LIMIT 1
+  `).bind(sessionHash).first();
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
