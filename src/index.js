@@ -1064,7 +1064,7 @@ if (
   url.pathname.match(/^\/api\/admin\/paid-mocks\/[^/]+\/status$/) &&
   method === "PATCH"
 ) {
-  const mockId = url.pathname.split("/")[5];
+  const mockId = url.pathname.split("/")[4];
 
   let body;
   try {
