@@ -558,6 +558,27 @@ tbody tr:hover {
     <p id="paidMocksStatus">Paid mock management</p>
   </div>
 
+    <div class="panel">
+    <h2>Create Paid Mock</h2>
+
+    <label>Mock Title</label>
+    <input id="paidMockTitle" type="text" placeholder="e.g. Monday Science Mock">
+
+    <label>Scheduled Date</label>
+    <input id="paidMockDate" type="date">
+
+    <label>Duration (minutes)</label>
+    <input id="paidMockDuration" type="number" min="1" placeholder="e.g. 60">
+
+    <label>Subjects</label>
+    <input id="paidMockSubjects" type="text" placeholder="e.g. English, Mathematics, Physics">
+
+    <label>Description (optional)</label>
+    <textarea id="paidMockDescription" rows="3" placeholder="Enter mock instructions"></textarea>
+
+    <button class="primary" id="createPaidMockBtn">Create Paid Mock</button>
+    <p id="createPaidMockStatus"></p>
+    </div>
   <div class="panel">
     <h2>All Paid Mocks</h2>
     <div id="paidMocksList">Loading paid mocks...</div>
