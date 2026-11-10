@@ -529,6 +529,48 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           message: "Your profile has been saved."
         });
       }
+      
+      // LOAD PUBLISHED PAID MOCKS FOR STUDENTS
+      if (
+        url.pathname === "/api/paid/mocks" &&
+        method === "GET"
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({
+            error: "Your session is invalid or your access is inactive."
+          }, 401);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT
+            m.id,
+            m.title,
+            m.scheduled_date,
+            m.duration_minutes,
+            (SELECT COUNT(*)
+             FROM paid_mock_subjects s
+             WHERE s.mock_id = m.id) AS subject_count,
+            (SELECT COUNT(*)
+             FROM paid_mock_questions q
+             WHERE q.mock_id = m.id) AS question_count,
+            a.status AS attempt_status,
+            a.score,
+            a.total_questions
+          FROM paid_mocks m
+          LEFT JOIN paid_mock_attempts a
+            ON a.mock_id = m.id
+            AND a.student_id = ?
+          WHERE m.status = 'published'
+          ORDER BY m.scheduled_date ASC
+        `).bind(student.id).all();
+
+        return json({
+          mocks: result.results || []
+        });
+      }
+      
             // PAID STUDENT ANNOUNCEMENTS
       if (
         url.pathname === "/api/paid/announcements" &&
