@@ -989,6 +989,20 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
 
           return json({ ok: true });
         }
+          // PAID MOCKS MANAGEMENT API
+
+if (url.pathname === "/api/admin/paid-mocks" && method === "GET") {
+  const result = await env.DB.prepare(`
+    SELECT
+      m.*,
+      (SELECT COUNT(*) FROM paid_mock_questions q WHERE q.mock_id = m.id) AS question_count,
+      (SELECT COUNT(*) FROM paid_mock_subjects s WHERE s.mock_id = m.id) AS subject_count
+    FROM paid_mocks m
+    ORDER BY m.scheduled_date DESC, m.created_at DESC
+  `).all();
+
+  return json({ mocks: result.results || [] });
+}
         // PAID ANNOUNCEMENTS MANAGEMENT API
 
 if (url.pathname === "/api/admin/announcements" && method === "GET") {
