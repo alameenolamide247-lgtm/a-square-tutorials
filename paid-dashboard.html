@@ -547,6 +547,16 @@
 
         $("welcomeHeading").textContent =
           `Welcome, ${student.fullName}`;
+        $("studentName").textContent = profile.fullName;
+$("studentEmail").textContent = profile.email;
+
+$("studentAvatar").textContent =
+  profile.fullName.trim().charAt(0).toUpperCase();
+
+$("goalMessage").textContent =
+  `Your dream is ${profile.dreamScore}/400. Stay focused as you work towards studying ${profile.aspiringCourse} at ${profile.aspiringUniversity}. Every practice session brings you closer!`;
+
+$("studentHeader").hidden = false;
 
         updateSubjectCount();
 
