@@ -1214,7 +1214,34 @@ async function loadAdminAnnouncements() {
           </div>
         `).join("")
       : '<p class="muted">No announcements created yet.</p>';
+$("addAnnouncementBtn").addEventListener("click", async () => {
+  const title = $("announcementTitle").value.trim();
+  const message = $("announcementMessage").value.trim();
+  const is_published = $("announcementPublished").checked;
 
+  if (!title || !message) {
+    $("announcementMessageStatus").textContent =
+      "Please enter both the title and message.";
+    return;
+  }
+
+  try {
+    await api("/api/admin/announcements", {
+      method: "POST",
+      body: JSON.stringify({ title, message, is_published })
+    });
+
+    $("announcementMessageStatus").textContent =
+      "Announcement saved successfully.";
+
+    $("announcementTitle").value = "";
+    $("announcementMessage").value = "";
+
+    await loadAdminAnnouncements();
+  } catch (e) {
+    $("announcementMessageStatus").textContent = e.message;
+  }
+});
   } catch (e) {
     $("adminAnnouncementsList").textContent = e.message;
   }
