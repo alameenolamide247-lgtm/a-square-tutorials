@@ -357,7 +357,119 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
 
                     return json({ results: result.results || [] });
         }
+        
+        // PAID STUDENT ID MANAGEMENT API
 
+        // Generate paid student IDs
+        if (url.pathname === "/api/admin/paid-student-ids" && method === "POST") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const count = Number(body.count);
+          const expiresAt = body.expiresAt
+            ? String(body.expiresAt).trim()
+            : null;
+
+          if (!Number.isInteger(count) || count < 1 || count > 100) {
+            return json({ error: "Generate between 1 and 100 Student IDs." }, 400);
+          }
+
+          if (expiresAt && (
+            !/^\d{4}-\d{2}-\d{2}$/.test(expiresAt) ||
+            Number.isNaN(Date.parse(expiresAt)) ||
+            new Date(expiresAt).toISOString().slice(0, 10) !== expiresAt
+          )) {
+            return json({ error: "Enter a valid expiry date." }, 400);
+          }
+
+          const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+          const generated = [];
+          const statements = [];
+
+          for (let i = 0; i < count; i++) {
+            const bytes = crypto.getRandomValues(new Uint8Array(16));
+            let randomPart = "";
+
+            for (const byte of bytes) {
+              randomPart += alphabet[byte % alphabet.length];
+            }
+
+            const code = "ASQP-" + randomPart;
+            generated.push(code);
+
+            statements.push(
+              env.DB.prepare(`
+                INSERT INTO paid_student_ids (id, code_hash, expires_at)
+                VALUES (?, ?, ?)
+              `).bind(
+                crypto.randomUUID(),
+                await sha256(code),
+                expiresAt
+              )
+            );
+          }
+
+          await env.DB.batch(statements);
+
+          return json({ ok: true, ids: generated }, 201);
+        }
+
+        // List paid Student IDs
+        if (url.pathname === "/api/admin/paid-student-ids" && method === "GET") {
+          const result = await env.DB.prepare(`
+            SELECT
+              id,
+              is_active,
+              expires_at,
+              created_at,
+              redeemed_at,
+              redeemed_by_email
+            FROM paid_student_ids
+            ORDER BY created_at DESC
+            LIMIT 500
+          `).all();
+
+          return json({ ids: result.results || [] });
+        }
+
+        // Activate or deactivate a paid Student ID
+        const paidIdMatch = url.pathname.match(
+          /^\/api\/admin\/paid-student-ids\/([a-f0-9-]+)$/i
+        );
+
+        if (paidIdMatch && method === "PATCH") {
+          let body;
+
+          try {
+            body = await request.json();
+          } catch {
+            return json({ error: "Invalid request." }, 400);
+          }
+
+          const isActive = Number(body.is_active);
+
+          if (![0, 1].includes(isActive)) {
+            return json({ error: "Invalid Student ID status." }, 400);
+          }
+
+          const result = await env.DB.prepare(`
+            UPDATE paid_student_ids
+            SET is_active = ?
+            WHERE id = ?
+          `).bind(isActive, paidIdMatch[1]).run();
+
+          if (!result.meta?.changes) {
+            return json({ error: "Student ID not found." }, 404);
+          }
+
+          return json({ ok: true });
+        }
+        
         // Generate access codes
         if (url.pathname === "/api/admin/codes" && method === "POST") {
           let body;
