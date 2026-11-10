@@ -1211,9 +1211,49 @@ async function loadAdminAnnouncements() {
               ${Number(item.is_published) === 1 ? "Published" : "Unpublished"}
               · ${formatDate(item.created_at)}
             </small>
+            <div class="actions">
+              <button onclick="toggleAnnouncement('${item.id}', ${Number(item.is_published) === 1 ? 0 : 1})">
+                ${Number(item.is_published) === 1 ? "Unpublish" : "Publish"}
+              </button>
+              <button class="danger" onclick="deleteAnnouncement('${item.id}')">
+                Delete
+              </button>
+            </div>
           </div>
         `).join("")
       : '<p class="muted">No announcements created yet.</p>';
+  } catch (e) {
+    $("adminAnnouncementsList").textContent = e.message;
+  }
+}
+
+async function toggleAnnouncement(id, status) {
+  try {
+    await api("/api/admin/announcements/" + encodeURIComponent(id), {
+      method: "PATCH",
+      body: JSON.stringify({ is_published: status })
+    });
+
+    await loadAdminAnnouncements();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function deleteAnnouncement(id) {
+  if (!confirm("Are you sure you want to delete this announcement?")) return;
+
+  try {
+    await api("/api/admin/announcements/" + encodeURIComponent(id), {
+      method: "DELETE"
+    });
+
+    await loadAdminAnnouncements();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
 $("addAnnouncementBtn").addEventListener("click", async () => {
   const title = $("announcementTitle").value.trim();
   const message = $("announcementMessage").value.trim();
@@ -1242,10 +1282,6 @@ $("addAnnouncementBtn").addEventListener("click", async () => {
     $("announcementMessageStatus").textContent = e.message;
   }
 });
-  } catch (e) {
-    $("adminAnnouncementsList").textContent = e.message;
-  }
-}
  async function toggleVideo(id, status) {
   try {
     const d = await api("/api/admin/videos");
