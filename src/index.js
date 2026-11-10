@@ -418,6 +418,118 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
       }
 
       
+      // PAID STUDENT PROFILE
+
+      if (
+        url.pathname === "/api/paid/profile" &&
+        (method === "GET" || method === "PUT")
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({ error: "Your session is invalid or your access is inactive." }, 401);
+        }
+
+        if (method === "GET") {
+          let subjects = [];
+
+          try {
+            subjects = JSON.parse(student.subjects_json || "[]");
+          } catch {
+            subjects = [];
+          }
+
+          return json({
+            profile: {
+              fullName: student.full_name,
+              email: student.email,
+              profilePictureUrl: student.profile_picture_url,
+              subjects,
+              dreamScore: student.dream_score,
+              aspiringCourse: student.aspiring_course,
+              aspiringUniversity: student.aspiring_university,
+              profileCompleted: Boolean(student.profile_completed)
+            }
+          });
+        }
+
+        let body;
+
+        try {
+          body = await request.json();
+        } catch {
+          return json({ error: "Invalid request." }, 400);
+        }
+
+        const allowedSubjects = [
+          "Mathematics",
+          "Physics",
+          "Chemistry",
+          "Biology"
+        ];
+
+        const subjects = body.subjects;
+        const dreamScore = Number(body.dreamScore);
+        const course = String(body.aspiringCourse || "").trim();
+        const university = String(body.aspiringUniversity || "").trim();
+
+        if (
+          !Array.isArray(subjects) ||
+          subjects.length !== 3 ||
+          new Set(subjects).size !== 3 ||
+          subjects.some(subject => !allowedSubjects.includes(subject))
+        ) {
+          return json({
+            error: "Choose exactly three subjects, excluding Use of English."
+          }, 400);
+        }
+
+        if (
+          !Number.isInteger(dreamScore) ||
+          dreamScore < 100 ||
+          dreamScore > 400
+        ) {
+          return json({
+            error: "Enter a dream JAMB score between 100 and 400."
+          }, 400);
+        }
+
+        if (course.length < 2 || course.length > 100) {
+          return json({ error: "Enter your aspiring course." }, 400);
+        }
+
+        if (university.length < 2 || university.length > 150) {
+          return json({ error: "Select your aspiring university." }, 400);
+        }
+
+        const subjectsJson = JSON.stringify([
+          "Use of English",
+          ...subjects
+        ]);
+
+        await env.DB.prepare(`
+          UPDATE paid_students
+          SET subjects_json = ?,
+              dream_score = ?,
+              aspiring_course = ?,
+              aspiring_university = ?,
+              profile_completed = 1,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(
+          subjectsJson,
+          dreamScore,
+          course,
+          university,
+          student.id
+        ).run();
+
+        return json({
+          ok: true,
+          message: "Your profile has been saved."
+        });
+      }
+      
             // ADMIN DASHBOARD API
       if (url.pathname.startsWith("/api/admin/") &&
           !["/api/admin/login", "/api/admin/session", "/api/admin/logout"].includes(url.pathname)) {
