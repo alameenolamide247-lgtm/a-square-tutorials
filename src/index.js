@@ -1045,6 +1045,62 @@ if (url.pathname === "/api/admin/paid-mocks" && method === "GET") {
 
   return json({ ok: true, id: mockId });
         }
+        if (url.pathname === "/api/admin/paid-mock-questions" && method === "POST") {
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request." }, 400);
+  }
+
+  const mockId = String(body.mock_id || "").trim();
+  const subjectId = String(body.subject_id || "").trim();
+  const questionText = String(body.question_text || "").trim();
+  const options = body.options || {};
+  const correctOption = String(body.correct_option || "").trim().toUpperCase();
+  const explanation = String(body.explanation || "").trim();
+
+  if (!mockId || !subjectId || !questionText ||
+      !["A", "B", "C", "D"].includes(correctOption) ||
+      ["A", "B", "C", "D"].some(key => !String(options[key] || "").trim())) {
+    return json({ error: "Complete the question, all four options and correct answer." }, 400);
+  }
+
+  const subject = await env.DB.prepare(`
+    SELECT id FROM paid_mock_subjects
+    WHERE id = ? AND mock_id = ?
+  `).bind(subjectId, mockId).first();
+
+  if (!subject) {
+    return json({ error: "Subject does not belong to this mock." }, 404);
+  }
+
+  const questionId = crypto.randomUUID();
+
+  const count = await env.DB.prepare(`
+    SELECT COUNT(*) AS total
+    FROM paid_mock_questions
+    WHERE subject_id = ?
+  `).bind(subjectId).first();
+
+  await env.DB.prepare(`
+    INSERT INTO paid_mock_questions
+    (id, mock_id, subject_id, question_text, options_json, correct_option, explanation, sort_order)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    questionId,
+    mockId,
+    subjectId,
+    questionText,
+    JSON.stringify(options),
+    correctOption,
+    explanation || null,
+    count.total
+  ).run();
+
+  return json({ ok: true, question_id: questionId });
+        }
         // PAID ANNOUNCEMENTS MANAGEMENT API
 
 if (url.pathname === "/api/admin/announcements" && method === "GET") {
