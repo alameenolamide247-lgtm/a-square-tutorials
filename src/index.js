@@ -963,7 +963,17 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
         if (attempt.status !== "in_progress") {
           return json({ error: "This examination has already ended." }, 409);
         }
+const deadline = new Date(attempt.deadline_at).getTime();
 
+if (Date.now() >= deadline) {
+  await finalizeExpiredPaidAttempt(env, attemptId, attempt.mock_id);
+
+  return json({
+    ok: true,
+    status: "expired",
+    message: "Your examination has been submitted."
+  });
+}
         const questionsResult = await env.DB.prepare(`
           SELECT id, correct_option
           FROM paid_mock_questions
