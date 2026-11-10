@@ -1045,6 +1045,20 @@ if (url.pathname === "/api/admin/paid-mocks" && method === "GET") {
 
   return json({ ok: true, id: mockId });
         }
+        if (url.pathname.startsWith("/api/admin/paid-mocks/") &&
+    url.pathname.endsWith("/subjects") && method === "GET") {
+
+  const mockId = url.pathname.split("/")[4];
+
+  const result = await env.DB.prepare(`
+    SELECT id, subject_name
+    FROM paid_mock_subjects
+    WHERE mock_id = ?
+    ORDER BY sort_order ASC
+  `).bind(mockId).all();
+
+  return json({ subjects: result.results || [] });
+        }
         if (url.pathname === "/api/admin/paid-mock-questions" && method === "POST") {
   let body;
 
