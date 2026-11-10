@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#073b91">
+  <title>My Dashboard | A² Tutorials</title>
+
+  <style>
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-regular.ttf');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-semibold.ttf');
+      font-weight: 600;
+    }
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-bold.ttf');
+      font-weight: 700;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Moanslight, sans-serif;
+      background: #f3f7ff;
+      color: #092653;
+      min-height: 100vh;
+    }
+
+    button, input, select { font: inherit; }
+
+    .topbar {
+      background: white;
+      padding: 16px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 15px #09265310;
+    }
+
+    .brand {
+      color: #0755c9;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .logout {
+      background: #edf4ff;
+      color: #0755c9;
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hero {
+      background: linear-gradient(120deg,#062b70,#0755c9 70%,#078fd0);
+      color: white;
+      padding: 38px 6%;
+    }
+
+    .hero h1 {
+      font-size: clamp(25px,4vw,36px);
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: #e0f2ff;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 850px;
+      margin: auto;
+      padding: 30px 17px 65px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #e0e9f5;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 25px #09265308;
+    }
+
+    h2 {
+      font-size: 21px;
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: #71809b;
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 17px 0 7px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d3deeb;
+      border-radius: 9px;
+      outline: none;
+      background: white;
+      color: #092653;
+    }
+
+    input:focus, select:focus {
+      border-color: #0755c9;
+      box-shadow: 0 0 0 3px #0755c915;
+    }
+
+    input[readonly] {
+      background: #f3f7ff;
+      color: #64748b;
+    }
+
+    .subject-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(145px,1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .subject-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid #dce7f5;
+      border-radius: 9px;
+      padding: 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .subject-option input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: #0755c9;
+    }
+
+    .english {
+      background: #eaf3ff;
+      border-color: #9fc5ff;
+      color: #0755c9;
+      font-weight: 700;
+    }
+
+    .primary {
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 9px;
+      background: linear-gradient(110deg,#0755c9,#078fd0);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 23px;
+    }
+
+    .primary:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .error {
+      display: block;
+      background: #fff0f0;
+      color: #b42318;
+    }
+
+    .success {
+      display: block;
+      background: #eaf8ef;
+      color: #168344;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 45px 15px;
+      color: #71809b;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 15px;
+      color: #71809b;
+      font-size: 12px;
+    }
+
+    @media(max-width:500px) {
+      .topbar { padding: 14px 5%; }
+      .brand { font-size: 18px; }
+      .panel { padding: 19px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand">A² TUTORIALS</div>
+    <button class="logout" id="logoutButton" type="button">
+      Log Out
+    </button>
+  </header>
+
+  <section class="hero">
+    <h1 id="welcomeHeading">Your Learning Dashboard</h1>
+    <p id="welcomeText">Excellence in Learning, Success in Results.</p>
+  </section>
+
+  <main>
+    <div id="loading" class="panel loading">
+      Checking your student account...
+    </div>
+
+    <section id="profilePanel" class="panel" hidden>
+      <h2>Set Up Your Student Profile</h2>
+      <p class="muted">
+        Complete your academic profile so A² Tutorials can tailor
+        your learning experience and track your progress.
+      </p>
+
+      <form id="profileForm">
+        <label for="fullName">Full Name</label>
+        <input id="fullName" type="text" readonly>
+
+        <label for="email">Email Address</label>
+        <input id="email" type="email" readonly>
+
+        <label>Compulsory Subject</label>
+        <div class="subject-list">
+          <div class="subject-option english">
+            <input type="checkbox" checked disabled>
+            <span>Use of English</span>
+          </div>
+        </div>
+
+        <label>Choose Your Other Three Subjects</label>
+        <p class="muted" id="subjectCount">Select exactly 3 subjects.</p>
+
+        <div class="subject-list" id="subjectOptions">
+          <label class="subject-option">
+            <input type="checkbox" name="subject" value="Mathematics">
+            Mathematics
+          </label>
+
+          <label class="subject-option">
+            <input type="checkbox" name="subject" value="Physics">
+            Physics
+          </label>
+
+          <label class="subject-option">
+            <input type="checkbox" name="subject" value="Chemistry">
+            Chemistry
+          </label>
+
+          <label class="subject-option">
+            <input type="checkbox" name="subject" value="Biology">
+            Biology
+          </label>
+        </div>
+
+        <label for="dreamScore">Dream JAMB Score</label>
+        <input
+          id="dreamScore"
+          type="number"
+          min="100"
+          max="400"
+          placeholder="Example: 320"
+          required
+        >
+
+        <label for="aspiringCourse">Aspiring Course</label>
+        <input
+          id="aspiringCourse"
+          type="text"
+          maxlength="100"
+          placeholder="Example: Electrical Engineering"
+          required
+        >
+
+        <label for="aspiringUniversity">Aspiring University</label>
+        <input
+          id="aspiringUniversity"
+          type="text"
+          maxlength="150"
+          placeholder="Enter your preferred Nigerian university"
+          required
+        >
+
+        <button class="primary" id="saveButton" type="submit">
+          Save My Profile
+        </button>
+      </form>
+
+      <div id="profileMessage" class="message"></div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 A² Tutorials. Excellence in Learning, Success in Results.
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    async function checkSession() {
+      const response = await fetch("/api/paid/auth/session", {
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+
+      if (!response.ok) throw new Error("Unable to verify your session.");
+
+      const result = await response.json();
+
+      if (!result.authenticated) {
+        location.replace("./paid-portal.html");
+        return null;
+      }
+
+      return result.student;
+    }
+
+    async function loadProfile() {
+      const response = await fetch("/api/paid/profile", {
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Unable to load your profile.");
+      }
+
+      return result.profile;
+    }
+
+    function showMessage(message, type) {
+      const box = $("profileMessage");
+      box.textContent = message;
+      box.className = "message " + type;
+    }
+
+    function updateSubjectCount() {
+      const selected = document.querySelectorAll(
+        'input[name="subject"]:checked'
+      ).length;
+
+      $("subjectCount").textContent =
+        `${selected} of 3 subjects selected.`;
+    }
+
+    document.querySelectorAll('input[name="subject"]').forEach(input => {
+      input.addEventListener("change", () => {
+        const selected = document.querySelectorAll(
+          'input[name="subject"]:checked'
+        );
+
+        if (selected.length > 3) {
+          input.checked = false;
+        }
+
+        updateSubjectCount();
+      });
+    });
+
+    $("profileForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const subjects = [...document.querySelectorAll(
+        'input[name="subject"]:checked'
+      )].map(input => input.value);
+
+      if (subjects.length !== 3) {
+        showMessage("Please select exactly three other subjects.", "error");
+        return;
+      }
+
+      const button = $("saveButton");
+      button.disabled = true;
+      button.textContent = "Saving Profile...";
+
+      try {
+        const response = await fetch("/api/paid/profile", {
+          method: "PUT",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            subjects,
+            dreamScore: Number($("dreamScore").value),
+            aspiringCourse: $("aspiringCourse").value.trim(),
+            aspiringUniversity: $("aspiringUniversity").value.trim()
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Unable to save your profile.");
+        }
+
+        showMessage("Your academic profile has been saved successfully.", "success");
+
+      } catch (error) {
+        showMessage(error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Save My Profile";
+      }
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      await fetch("/api/paid/auth/logout", {
+        method: "POST",
+        credentials: "same-origin"
+      });
+
+      location.replace("./paid-portal.html");
+    });
+
+    async function startDashboard() {
+      try {
+        const student = await checkSession();
+        if (!student) return;
+
+        const profile = await loadProfile();
+
+        $("fullName").value = profile.fullName;
+        $("email").value = profile.email;
+        $("dreamScore").value = profile.dreamScore || "";
+        $("aspiringCourse").value = profile.aspiringCourse || "";
+        $("aspiringUniversity").value = profile.aspiringUniversity || "";
+
+        if (Array.isArray(profile.subjects)) {
+          profile.subjects
+            .filter(subject => subject !== "Use of English")
+            .forEach(subject => {
+              const checkbox = document.querySelector(
+                `input[name="subject"][value="${subject}"]`
+              );
+              if (checkbox) checkbox.checked = true;
+            });
+        }
+
+        $("welcomeHeading").textContent =
+          `Welcome, ${student.fullName}`;
+
+        updateSubjectCount();
+
+        $("loading").hidden = true;
+        $("profilePanel").hidden = false;
+
+      } catch (error) {
+        $("loading").textContent = error.message;
+      }
+    }
+
+    startDashboard();
+  </script>
+
+</body>
+</html>
