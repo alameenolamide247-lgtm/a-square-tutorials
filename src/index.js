@@ -1047,7 +1047,7 @@ if (Date.now() >= deadline) {
 
                 return json({
           ok: true,
-          status: expired ? "expired" : "submitted",
+          status: "submitted",
           message: "Your examination has been submitted."
         });
       }
