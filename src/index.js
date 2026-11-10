@@ -136,6 +136,261 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
     }
   });
 }
+      
+      // PAID STUDENT AUTHENTICATION
+
+      // Student registration
+      if (url.pathname === "/api/paid/auth/signup" && method === "POST") {
+        if (!env.DB) {
+          return json({ error: "Database is not configured." }, 500);
+        }
+
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return json({ error: "Invalid request." }, 400);
+        }
+
+        const fullName = String(body.fullName || "").trim();
+        const email = String(body.email || "").trim().toLowerCase();
+        const studentCode = String(body.studentId || "")
+          .trim()
+          .toUpperCase();
+
+        if (fullName.length < 2 || fullName.length > 100) {
+          return json({ error: "Enter your full name." }, 400);
+        }
+
+        if (
+          email.length > 254 ||
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        ) {
+          return json({ error: "Enter a valid email address." }, 400);
+        }
+
+        if (!/^ASQP-[A-HJ-NP-Z2-9]{32}$/.test(studentCode)) {
+          return json({ error: "Invalid Student ID." }, 400);
+        }
+
+        const codeHash = await sha256(studentCode);
+        const studentId = crypto.randomUUID();
+        const sessionToken = [...crypto.getRandomValues(new Uint8Array(32))]
+          .map(byte => byte.toString(16).padStart(2, "0"))
+          .join("");
+        const sessionHash = await sha256(sessionToken);
+        const sessionExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          .toISOString();
+
+        const results = await env.DB.batch([
+          env.DB.prepare(`
+            INSERT INTO paid_students (
+              id, student_id_id, full_name, email
+            )
+            SELECT ?, id, ?, ?
+            FROM paid_student_ids
+            WHERE code_hash = ?
+              AND is_active = 1
+              AND (expires_at IS NULL OR expires_at >= date('now'))
+              AND redeemed_at IS NULL
+              AND NOT EXISTS (
+                SELECT 1 FROM paid_students WHERE email = ?
+              )
+          `).bind(
+            studentId,
+            fullName,
+            email,
+            codeHash,
+            email
+          ),
+
+          env.DB.prepare(`
+            UPDATE paid_student_ids
+            SET redeemed_at = CURRENT_TIMESTAMP,
+                redeemed_by_email = ?
+            WHERE code_hash = ?
+              AND redeemed_at IS NULL
+              AND EXISTS (
+                SELECT 1 FROM paid_students
+                WHERE student_id_id = paid_student_ids.id
+                  AND email = ?
+              )
+          `).bind(email, codeHash, email),
+
+          env.DB.prepare(`
+            INSERT INTO paid_student_sessions (
+              session_hash, student_id, expires_at
+            )
+            SELECT ?, id, ?
+            FROM paid_students
+            WHERE id = ?
+          `).bind(sessionHash, sessionExpiry, studentId)
+        ]);
+
+        if (!results[0]?.meta?.changes) {
+          return json({
+            error: "This Student ID is invalid, expired, inactive, or already used. Check your details or contact A-Square."
+          }, 400);
+        }
+
+        return new Response(JSON.stringify({
+          ok: true,
+          student: {
+            id: studentId,
+            fullName,
+            email
+          }
+        }), {
+          status: 201,
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store",
+            "set-cookie": `asq_paid_session=${sessionToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000`
+          }
+        });
+      }
+
+      // Student login
+      if (url.pathname === "/api/paid/auth/login" && method === "POST") {
+        if (!env.DB) {
+          return json({ error: "Database is not configured." }, 500);
+        }
+
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return json({ error: "Invalid request." }, 400);
+        }
+
+        const email = String(body.email || "").trim().toLowerCase();
+        const studentCode = String(body.studentId || "")
+          .trim()
+          .toUpperCase();
+
+        if (
+          email.length > 254 ||
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+          !/^ASQP-[A-HJ-NP-Z2-9]{32}$/.test(studentCode)
+        ) {
+          return json({ error: "Invalid email or Student ID." }, 400);
+        }
+
+        const codeHash = await sha256(studentCode);
+
+        const student = await env.DB.prepare(`
+          SELECT s.id, s.full_name, s.email
+          FROM paid_students s
+          JOIN paid_student_ids i ON i.id = s.student_id_id
+          WHERE s.email = ?
+            AND i.code_hash = ?
+            AND i.is_active = 1
+            AND (i.expires_at IS NULL OR i.expires_at >= date('now'))
+          LIMIT 1
+        `).bind(email, codeHash).first();
+
+        if (!student) {
+          return json({
+            error: "Invalid email or Student ID, or access is inactive."
+          }, 401);
+        }
+
+        const sessionToken = [...crypto.getRandomValues(new Uint8Array(32))]
+          .map(byte => byte.toString(16).padStart(2, "0"))
+          .join("");
+        const sessionHash = await sha256(sessionToken);
+        const sessionExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          .toISOString();
+
+        await env.DB.prepare(`
+          INSERT INTO paid_student_sessions (
+            session_hash, student_id, expires_at
+          ) VALUES (?, ?, ?)
+        `).bind(sessionHash, student.id, sessionExpiry).run();
+
+        return new Response(JSON.stringify({
+          ok: true,
+          student: {
+            id: student.id,
+            fullName: student.full_name,
+            email: student.email
+          }
+        }), {
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store",
+            "set-cookie": `asq_paid_session=${sessionToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000`
+          }
+        });
+      }
+
+      // Check student login session and current Student ID status
+      if (url.pathname === "/api/paid/auth/session" && method === "GET") {
+        if (!env.DB) {
+          return json({ error: "Database is not configured." }, 500);
+        }
+
+        const cookie = request.headers.get("Cookie") || "";
+        const match = cookie.match(/(?:^|;\s*)asq_paid_session=([a-f0-9]{64})/);
+
+        if (!match) {
+          return json({ authenticated: false });
+        }
+
+        const sessionHash = await sha256(match[1]);
+
+        const student = await env.DB.prepare(`
+          SELECT s.id, s.full_name, s.email
+          FROM paid_student_sessions ps
+          JOIN paid_students s ON s.id = ps.student_id
+          JOIN paid_student_ids i ON i.id = s.student_id_id
+          WHERE ps.session_hash = ?
+            AND ps.revoked_at IS NULL
+            AND ps.expires_at > datetime('now')
+            AND i.is_active = 1
+            AND (i.expires_at IS NULL OR i.expires_at >= date('now'))
+          LIMIT 1
+        `).bind(sessionHash).first();
+
+        if (!student) {
+          return json({ authenticated: false });
+        }
+
+        return json({
+          authenticated: true,
+          student: {
+            id: student.id,
+            fullName: student.full_name,
+            email: student.email
+          }
+        });
+      }
+
+      // Student logout
+      if (url.pathname === "/api/paid/auth/logout" && method === "POST") {
+        const cookie = request.headers.get("Cookie") || "";
+        const match = cookie.match(/(?:^|;\s*)asq_paid_session=([a-f0-9]{64})/);
+
+        if (match && env.DB) {
+          const sessionHash = await sha256(match[1]);
+
+          await env.DB.prepare(`
+            UPDATE paid_student_sessions
+            SET revoked_at = CURRENT_TIMESTAMP
+            WHERE session_hash = ?
+          `).bind(sessionHash).run();
+        }
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store",
+            "set-cookie": "asq_paid_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"
+          }
+        });
+      }
+
+      
             // ADMIN DASHBOARD API
       if (url.pathname.startsWith("/api/admin/") &&
           !["/api/admin/login", "/api/admin/session", "/api/admin/logout"].includes(url.pathname)) {
