@@ -74,7 +74,66 @@
       color: #e0f2ff;
       font-size: 14px;
     }
+.student-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 25px 6%;
+  background: white;
+  border-bottom: 1px solid #e0e9f5;
+}
 
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.student-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #eaf3ff;
+  color: #0755c9;
+  display: grid;
+  place-items: center;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.student-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.student-email {
+  color: #71809b;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.goal-message {
+  max-width: 350px;
+  padding: 15px 18px;
+  border-radius: 12px;
+  background: #edf5ff;
+  color: #0755c9;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media(max-width:600px) {
+  .student-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .goal-message {
+    max-width: none;
+    width: 100%;
+  }
+}
     main {
       max-width: 850px;
       margin: auto;
