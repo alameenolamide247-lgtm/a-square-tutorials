@@ -835,7 +835,28 @@ async function setPaidMockStatus(mockId, status) {
     alert(error.message);
   }
 }
- 
+ async function setPaidMockResults(mockId, resultsReleased) {
+  const action = resultsReleased === 1 ? "release" : "hide";
+
+  if (!confirm(`Are you sure you want to ${action} results for this mock?`)) {
+    return;
+  }
+
+  try {
+    await api(`/api/admin/paid-mocks/${mockId}/results`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        results_released: resultsReleased
+      })
+    });
+
+    await loadPaidMocks();
+    alert(`Results ${action === "release" ? "released" : "hidden"} successfully!`);
+
+  } catch (error) {
+    alert(error.message);
+  }
+ }
  let selectedPaidMockId = "";
 
 async function loadPaidQuestionSubjects(mockId) {
