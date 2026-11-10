@@ -1198,7 +1198,27 @@ $("generatePaidIdsBtn").addEventListener("click", async () => {
     alert(e.message);
   }
  }
+async function loadAdminAnnouncements() {
+  try {
+    const data = await api("/api/admin/announcements");
 
+    $("adminAnnouncementsList").innerHTML = data.announcements.length
+      ? data.announcements.map(item => `
+          <div class="panel">
+            <h3>${escapeHTML(item.title)}</h3>
+            <p>${escapeHTML(item.message).replace(/\n/g, "<br>")}</p>
+            <small>
+              ${Number(item.is_published) === 1 ? "Published" : "Unpublished"}
+              · ${formatDate(item.created_at)}
+            </small>
+          </div>
+        `).join("")
+      : '<p class="muted">No announcements created yet.</p>';
+
+  } catch (e) {
+    $("adminAnnouncementsList").textContent = e.message;
+  }
+}
  async function toggleVideo(id, status) {
   try {
     const d = await api("/api/admin/videos");
