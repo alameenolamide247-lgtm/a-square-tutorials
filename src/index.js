@@ -603,8 +603,9 @@ if (
              FROM paid_mock_questions q
              WHERE q.mock_id = m.id) AS question_count,
             a.status AS attempt_status,
-            a.score,
-            a.total_questions
+m.results_released,
+CASE WHEN m.results_released = 1 THEN a.score ELSE NULL END AS score,
+CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_questions
           FROM paid_mocks m
           LEFT JOIN paid_mock_attempts a
             ON a.mock_id = m.id
