@@ -1004,6 +1004,47 @@ if (url.pathname === "/api/admin/paid-mocks" && method === "GET") {
 
   return json({ mocks: result.results || [] });
 }
+        if (url.pathname === "/api/admin/paid-mocks" && method === "POST") {
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request." }, 400);
+  }
+
+  const title = String(body.title || "").trim();
+  const scheduledDate = String(body.scheduled_date || "").trim();
+  const duration = Number(body.duration_minutes);
+  const subjects = Array.isArray(body.subjects)
+    ? body.subjects.map(s => String(s).trim()).filter(Boolean)
+    : [];
+
+  if (!title || !scheduledDate || !Number.isInteger(duration) || duration < 1 || !subjects.length) {
+    return json({ error: "Enter a title, date, valid duration and at least one subject." }, 400);
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(scheduledDate) ||
+      Number.isNaN(Date.parse(scheduledDate))) {
+    return json({ error: "Enter a valid scheduled date." }, 400);
+  }
+
+  const mockId = crypto.randomUUID();
+
+  await env.DB.prepare(`
+    INSERT INTO paid_mocks (id, title, scheduled_date, duration_minutes)
+    VALUES (?, ?, ?, ?)
+  `).bind(mockId, title, scheduledDate, duration).run();
+
+  for (let i = 0; i < subjects.length; i++) {
+    await env.DB.prepare(`
+      INSERT INTO paid_mock_subjects (id, mock_id, subject_name, sort_order)
+      VALUES (?, ?, ?, ?)
+    `).bind(crypto.randomUUID(), mockId, subjects[i], i).run();
+  }
+
+  return json({ ok: true, id: mockId });
+        }
         // PAID ANNOUNCEMENTS MANAGEMENT API
 
 if (url.pathname === "/api/admin/announcements" && method === "GET") {
