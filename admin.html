@@ -331,6 +331,44 @@ tbody tr:hover {
     </div>
   </section>
 
+ 
+<section class="page" id="paid-ids">
+  <div class="panel">
+    <h2>Paid Student ID Management</h2>
+    <p class="muted">Generate and manage access IDs for paid students.</p>
+
+    <label>Number of Student IDs</label>
+    <input id="paidIdCount" type="number" min="1" max="100" value="10">
+
+    <label>Expiry Date (optional)</label>
+    <input id="paidIdExpiry" type="date">
+
+    <button class="primary" id="generatePaidIdsBtn">
+      Generate Student IDs
+    </button>
+
+    <div id="generatedPaidIds" style="margin-top:20px"></div>
+  </div>
+
+  <div class="panel">
+    <h2>All Paid Student IDs</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Status</th>
+            <th>Expiry Date</th>
+            <th>Registered Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="paidIdsTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+ 
   <section class="page" id="mocks">
     <div class="panel">
       <div class="top">
