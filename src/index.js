@@ -584,6 +584,7 @@ return json({
   paidPublished: paidPublished?.count || 0,
   paidDrafts: paidDrafts?.count || 0
 });
+}
 
         // List all mocks
         if (url.pathname === "/api/admin/mocks" && method === "GET") {
