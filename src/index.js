@@ -985,11 +985,7 @@ if (Date.now() >= deadline) {
           questions.map(question => [question.id, question.correct_option])
         );
 
-        const now = Date.now();
-        const deadline = new Date(attempt.deadline_at).getTime();
-        const expired = now > deadline;
-
-        const submittedAnswers = expired ? [] : body.answers;
+        const submittedAnswers = body.answers;
         const seen = new Set();
         let score = 0;
 
