@@ -789,11 +789,16 @@ async function loadPaidMocks() {
                 <td>${m.subject_count}</td>
                 <td>${m.question_count}</td>
                 <td>${escapeHTML(m.status)}</td>
-                <td>
-                  <button class="primary" onclick="loadPaidQuestionSubjects('${m.id}')">
-                    Add Questions
-                  </button>
-                </td>
+                
+<td>
+  <button class="primary" onclick="loadPaidQuestionSubjects('${m.id}')">
+    Add Questions
+  </button>
+  <button class="primary" onclick="setPaidMockStatus('${m.id}', '${m.status === "published" ? "draft" : "published"}')">
+    ${m.status === "published" ? "Unpublish" : "Publish"}
+  </button>
+</td>
+
               </tr>
             `).join("")}
           </tbody>
