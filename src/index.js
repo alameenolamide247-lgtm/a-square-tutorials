@@ -801,6 +801,105 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           questions
         });
       }
+      
+      // SAVE AN ANSWER DURING A PAID MOCK
+      const paidAnswerMatch = url.pathname.match(
+        /^\/api\/paid\/attempt\/([a-f0-9-]+)\/answer$/
+      );
+
+      if (paidAnswerMatch && method === "POST") {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({ error: "Your session is invalid or inactive." }, 401);
+        }
+
+        const attemptId = paidAnswerMatch[1];
+
+        let body;
+
+        try {
+          body = await request.json();
+        } catch {
+          return json({ error: "Invalid answer data." }, 400);
+        }
+
+        const questionId = String(body.questionId || "").trim();
+        const selectedOption = String(body.selectedOption || "").trim();
+
+        if (!questionId || !selectedOption) {
+          return json({ error: "A question and answer are required." }, 400);
+        }
+
+        const attempt = await env.DB.prepare(`
+          SELECT id, mock_id, deadline_at, status
+          FROM paid_mock_attempts
+          WHERE id = ?
+            AND student_id = ?
+          LIMIT 1
+        `).bind(attemptId, student.id).first();
+
+        if (!attempt) {
+          return json({ error: "Examination attempt not found." }, 404);
+        }
+
+        if (attempt.status !== "in_progress") {
+          return json({ error: "This examination is no longer active." }, 409);
+        }
+
+        if (Date.now() >= new Date(attempt.deadline_at).getTime()) {
+          await env.DB.prepare(`
+            UPDATE paid_mock_attempts
+            SET status = 'expired',
+                submitted_at = datetime('now')
+            WHERE id = ?
+              AND status = 'in_progress'
+          `).bind(attemptId).run();
+
+          return json({ error: "Your examination time has expired." }, 410);
+        }
+
+        const question = await env.DB.prepare(`
+          SELECT id, options_json
+          FROM paid_mock_questions
+          WHERE id = ?
+            AND mock_id = ?
+          LIMIT 1
+        `).bind(questionId, attempt.mock_id).first();
+
+        if (!question) {
+          return json({ error: "Question not found." }, 404);
+        }
+
+        let options = {};
+
+        try {
+          options = JSON.parse(question.options_json || "{}");
+        } catch {
+          return json({ error: "Question options are invalid." }, 500);
+        }
+
+        if (!Object.prototype.hasOwnProperty.call(options, selectedOption)) {
+          return json({ error: "Invalid answer option." }, 400);
+        }
+
+        await env.DB.prepare(`
+          INSERT INTO paid_mock_answers
+            (attempt_id, question_id, selected_option, answered_at)
+          VALUES (?, ?, ?, datetime('now'))
+          ON CONFLICT(attempt_id, question_id)
+          DO UPDATE SET
+            selected_option = excluded.selected_option,
+            answered_at = excluded.answered_at
+        `).bind(
+          attemptId,
+          questionId,
+          selectedOption
+        ).run();
+
+        return json({ ok: true });
+      }
+      
             // SUBMIT A PAID MOCK ATTEMPT
       const paidSubmitMatch = url.pathname.match(
         /^\/api\/paid\/attempt\/([a-f0-9-]+)\/submit$/
