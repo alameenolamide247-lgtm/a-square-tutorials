@@ -685,7 +685,8 @@ async function loadPaidMocks() {
   } catch (error) {
     alert(error.message);
     button.disabled = false;
-    button.textContent = "Start Mock";
+    button.textContent =
+  button.dataset.mockId ? "Start / Resume Mock" : "Start Mock";
   }
 });
 function escapeHtml(value) {
