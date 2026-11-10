@@ -1647,7 +1647,45 @@ if (
 
   return json({ ok: true, status });
 }
-        
+ // RELEASE OR HIDE PAID MOCK RESULTS
+if (
+  url.pathname.match(/^\/api\/admin\/paid-mocks\/[^/]+\/results$/) &&
+  method === "PATCH"
+) {
+  const mockId = url.pathname.split("/")[4];
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request." }, 400);
+  }
+
+  const resultsReleased = Number(body.results_released);
+
+  if (![0, 1].includes(resultsReleased)) {
+    return json({ error: "Invalid results release status." }, 400);
+  }
+
+  const mock = await env.DB.prepare(`
+    SELECT id FROM paid_mocks WHERE id = ?
+  `).bind(mockId).first();
+
+  if (!mock) {
+    return json({ error: "Paid mock not found." }, 404);
+  }
+
+  await env.DB.prepare(`
+    UPDATE paid_mocks
+    SET results_released = ?
+    WHERE id = ?
+  `).bind(resultsReleased, mockId).run();
+
+  return json({
+    ok: true,
+    results_released: resultsReleased
+  });
+}       
         if (url.pathname === "/api/admin/paid-mock-questions" && method === "POST") {
   let body;
 
