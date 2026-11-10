@@ -7,7 +7,37 @@ const json = (data, status = 200) =>
       "cache-control": "no-store"
     }
   });
+async function finalizeExpiredPaidAttempt(env, attemptId, mockId) {
+  const result = await env.DB.prepare(`
+    SELECT
+      COUNT(q.id) AS total_questions,
+      COALESCE(SUM(
+        CASE
+          WHEN a.selected_option = q.correct_option THEN 1
+          ELSE 0
+        END
+      ), 0) AS score
+    FROM paid_mock_questions q
+    LEFT JOIN paid_mock_answers a
+      ON a.question_id = q.id
+      AND a.attempt_id = ?
+    WHERE q.mock_id = ?
+  `).bind(attemptId, mockId).first();
 
+  await env.DB.prepare(`
+    UPDATE paid_mock_attempts
+    SET status = 'expired',
+        submitted_at = datetime('now'),
+        score = ?,
+        total_questions = ?
+    WHERE id = ?
+      AND status = 'in_progress'
+  `).bind(
+    Number(result?.score) || 0,
+    Number(result?.total_questions) || 0,
+    attemptId
+  ).run();
+}
 async function sha256(value) {
   const bytes = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
