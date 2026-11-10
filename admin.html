@@ -754,6 +754,7 @@ $("paidMockPublished").textContent = d.paidPublished;
 $("paidMockDrafts").textContent = d.paidDrafts;
   } catch (e) { console.error(e); }
 }
+
 async function loadPaidMocks() {
   const list = $("paidMocksList");
   const status = $("paidMocksStatus");
@@ -767,48 +768,45 @@ async function loadPaidMocks() {
 
     list.innerHTML = d.mocks.length
       ? `
-        
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Scheduled Date</th>
+              <th>Duration</th>
+              <th>Subjects</th>
+              <th>Questions</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${d.mocks.map(m => `
+              <tr>
+                <td>${escapeHTML(m.title)}</td>
+                <td>${escapeHTML(m.scheduled_date)}</td>
+                <td>${m.duration_minutes} mins</td>
+                <td>${m.subject_count}</td>
+                <td>${m.question_count}</td>
+                <td>${escapeHTML(m.status)}</td>
+                <td>
+                  <button class="primary" onclick="loadPaidQuestionSubjects('${m.id}')">
+                    Add Questions
+                  </button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `
+      : "<p class='muted'>No paid mocks created yet.</p>";
 
-list.innerHTML = d.mocks.length
-  ? `
-    <table>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Scheduled Date</th>
-          <th>Duration</th>
-          <th>Subjects</th>
-          <th>Questions</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${d.mocks.map(m => `
-          <tr>
-            <td>${escapeHTML(m.title)}</td>
-            <td>${escapeHTML(m.scheduled_date)}</td>
-            <td>${m.duration_minutes} mins</td>
-            <td>${m.subject_count}</td>
-            <td>${m.question_count}</td>
-            <td>${escapeHTML(m.status)}</td>
-            <td>
-              <button class="primary" onclick="loadPaidQuestionSubjects('${m.id}')">
-                Add Questions
-              </button>
-            </td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `
-  : "<p class='muted'>No paid mocks created yet.</p>";
-  
   } catch (e) {
     status.textContent = "Unable to load paid mocks.";
     list.textContent = e.message;
   }
 }
+ 
  $("createPaidMockBtn").addEventListener("click", async () => {
   const title = $("paidMockTitle").value.trim();
   const scheduled_date = $("paidMockDate").value;
