@@ -648,10 +648,35 @@
         radio.value = key;
         radio.checked = answers[question.id] === key;
 
-        radio.addEventListener("change", () => {
+                radio.addEventListener("change", async () => {
           answers[question.id] = key;
           saveLocalAnswers();
           renderQuestion();
+
+          try {
+            const response = await fetch(
+              `/api/paid/attempt/${encodeURIComponent(attemptId)}/answer`,
+              {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  questionId: question.id,
+                  selectedOption: key
+                })
+              }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.error || "Unable to save your answer.");
+            }
+          } catch (error) {
+            showMessage("Answer Not Saved", error.message);
+          }
         });
 
         const text = document.createElement("span");
