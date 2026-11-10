@@ -624,9 +624,15 @@ async function loadPaidMocks() {
             <p class="muted">Questions: ${Number(mock.question_count) || 0}</p>
             <p><strong>Status:</strong> ${status}</p>
             ${
-              mock.score !== null && mock.score !== undefined
-                ? `<p><strong>Score:</strong> ${Number(mock.score)} / ${Number(mock.total_questions) || 0}</p>`
-                : ""
+  mock.score !== null && mock.score !== undefined
+    ? `<p><strong>Score:</strong> ${Number(mock.score)} / ${Number(mock.total_questions) || 0}</p>`
+    : (
+        (mock.attempt_status === "submitted" ||
+         mock.attempt_status === "expired") &&
+        !mock.results_released
+      )
+      ? '<p style="color:#b7791f;font-weight:700;">Results pending release</p>'
+      : ""
             }
             ${
               mock.attempt_status === "submitted" ||
