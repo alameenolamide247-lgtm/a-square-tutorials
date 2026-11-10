@@ -531,6 +531,30 @@ tbody tr:hover {
     </div>
   </div>
  </section>
+ <section class="page" id="announcements">
+  <div class="panel">
+    <h2>Create Announcement</h2>
+
+    <label>Announcement Title</label>
+    <input id="announcementTitle" type="text" placeholder="Enter announcement title">
+
+    <label>Announcement Message</label>
+    <textarea id="announcementMessage" rows="5" placeholder="Write your announcement"></textarea>
+
+    <label>
+      <input id="announcementPublished" type="checkbox" checked>
+      Publish immediately
+    </label>
+
+    <button class="primary" id="addAnnouncementBtn">Post Announcement</button>
+    <p id="announcementMessageStatus"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Manage Announcements</h2>
+    <div id="adminAnnouncementsList">Loading announcements...</div>
+  </div>
+ </section>
 
 </main>
 </div>
