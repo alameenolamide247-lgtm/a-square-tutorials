@@ -713,6 +713,94 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           resumed: false
         });
       }
+            // LOAD QUESTIONS FOR A PAID MOCK ATTEMPT
+      const paidQuestionsMatch = url.pathname.match(
+        /^\/api\/paid\/attempt\/([a-f0-9-]+)\/questions$/
+      );
+
+      if (paidQuestionsMatch && method === "GET") {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({ error: "Your session is invalid or inactive." }, 401);
+        }
+
+        const attemptId = paidQuestionsMatch[1];
+
+        const attempt = await env.DB.prepare(`
+          SELECT
+            a.id,
+            a.mock_id,
+            a.deadline_at,
+            a.status,
+            m.title
+          FROM paid_mock_attempts a
+          JOIN paid_mocks m ON m.id = a.mock_id
+          WHERE a.id = ?
+            AND a.student_id = ?
+          LIMIT 1
+        `).bind(attemptId, student.id).first();
+
+        if (!attempt) {
+          return json({ error: "Examination attempt not found." }, 404);
+        }
+
+        if (attempt.status !== "in_progress") {
+          return json({ error: "This examination is no longer active." }, 409);
+        }
+
+        const remainingSeconds = Math.floor(
+          (new Date(attempt.deadline_at).getTime() - Date.now()) / 1000
+        );
+
+        if (remainingSeconds <= 0) {
+          await env.DB.prepare(`
+            UPDATE paid_mock_attempts
+            SET status = 'expired',
+                submitted_at = datetime('now')
+            WHERE id = ?
+              AND status = 'in_progress'
+          `).bind(attemptId).run();
+
+          return json({ error: "Your examination time has expired." }, 410);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT
+            q.id,
+            q.question_text,
+            q.options_json,
+            s.subject_name
+          FROM paid_mock_questions q
+          JOIN paid_mock_subjects s ON s.id = q.subject_id
+          WHERE q.mock_id = ?
+          ORDER BY s.sort_order ASC, q.sort_order ASC
+        `).bind(attempt.mock_id).all();
+
+        const questions = (result.results || []).map(question => {
+          let options = {};
+
+          try {
+            options = JSON.parse(question.options_json);
+          } catch {
+            options = {};
+          }
+
+          return {
+            id: question.id,
+            questionText: question.question_text,
+            options,
+            subject: question.subject_name
+          };
+        });
+
+        return json({
+          title: attempt.title,
+          deadlineAt: attempt.deadline_at,
+          remainingSeconds,
+          questions
+        });
+      }
             // PAID STUDENT ANNOUNCEMENTS
       if (
         url.pathname === "/api/paid/announcements" &&
