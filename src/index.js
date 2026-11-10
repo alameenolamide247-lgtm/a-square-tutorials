@@ -765,17 +765,21 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           return json({ error: "Your examination time has expired." }, 410);
         }
 
-        const result = await env.DB.prepare(`
+                const result = await env.DB.prepare(`
           SELECT
             q.id,
             q.question_text,
             q.options_json,
-            s.subject_name
+            s.subject_name,
+            a.selected_option
           FROM paid_mock_questions q
           JOIN paid_mock_subjects s ON s.id = q.subject_id
+          LEFT JOIN paid_mock_answers a
+            ON a.question_id = q.id
+            AND a.attempt_id = ?
           WHERE q.mock_id = ?
           ORDER BY s.sort_order ASC, q.sort_order ASC
-        `).bind(attempt.mock_id).all();
+        `).bind(attemptId, attempt.mock_id).all();
 
         const questions = (result.results || []).map(question => {
           let options = {};
