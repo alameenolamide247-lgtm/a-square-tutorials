@@ -193,7 +193,24 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
     }
   });
 }
-      
+   // Protect all admin API routes
+if (
+  url.pathname.startsWith("/api/admin/") &&
+  ![
+    "/api/admin/login",
+    "/api/admin/session",
+    "/api/admin/logout"
+  ].includes(url.pathname)
+) {
+  const authenticated = await verifyAdminSession(
+    request,
+    env.ADMIN_PASSWORD
+  );
+
+  if (!authenticated) {
+    return json({ error: "Admin authentication required." }, 401);
+  }
+}   
       // PAID STUDENT AUTHENTICATION
 
       // Student registration
