@@ -660,6 +660,7 @@ async function loadPaidMocks() {
 
   const mockId = button.dataset.mockId;
 
+    const originalLabel = button.textContent;
   button.disabled = true;
   button.textContent = "Starting Mock...";
 
@@ -685,8 +686,7 @@ async function loadPaidMocks() {
   } catch (error) {
     alert(error.message);
     button.disabled = false;
-    button.textContent =
-  button.dataset.mockId ? "Start / Resume Mock" : "Start Mock";
+        button.textContent = originalLabel;
   }
 });
 function escapeHtml(value) {
