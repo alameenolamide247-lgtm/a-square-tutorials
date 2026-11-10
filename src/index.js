@@ -1026,6 +1026,49 @@ if (url.pathname === "/api/admin/announcements" && method === "POST") {
 
   return json({ ok: true, id }, 201);
 }
+        const announcementMatch = url.pathname.match(
+  /^\/api\/admin\/announcements\/([^/]+)$/
+);
+
+if (announcementMatch && method === "PATCH") {
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request." }, 400);
+  }
+
+  const isPublished = Number(body.is_published);
+
+  if (![0, 1].includes(isPublished)) {
+    return json({ error: "Invalid publishing status." }, 400);
+  }
+
+  const result = await env.DB.prepare(`
+    UPDATE paid_announcements
+    SET is_published = ?
+    WHERE id = ?
+  `).bind(isPublished, announcementMatch[1]).run();
+
+  if (!result.meta?.changes) {
+    return json({ error: "Announcement not found." }, 404);
+  }
+
+  return json({ ok: true });
+}
+
+if (announcementMatch && method === "DELETE") {
+  const result = await env.DB.prepare(
+    "DELETE FROM paid_announcements WHERE id = ?"
+  ).bind(announcementMatch[1]).run();
+
+  if (!result.meta?.changes) {
+    return json({ error: "Announcement not found." }, 404);
+  }
+
+  return json({ ok: true });
+}
                   // ==========================================
         // A-SQUARE VIDEOS MANAGEMENT API
 
