@@ -794,7 +794,8 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
             id: question.id,
             questionText: question.question_text,
             options,
-            subject: question.subject_name
+                        subject: question.subject_name,
+            selectedOption: question.selected_option || null
           };
         });
 
