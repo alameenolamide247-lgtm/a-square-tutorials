@@ -529,7 +529,26 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           message: "Your profile has been saved."
         });
       }
-      
+            // PAID STUDENT ANNOUNCEMENTS
+      if (
+        url.pathname === "/api/paid/announcements" &&
+        method === "GET"
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({ error: "Your session is invalid or your access is inactive." }, 401);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT id, title, message, created_at
+          FROM paid_announcements
+          WHERE is_published = 1
+          ORDER BY created_at DESC
+        `).all();
+
+        return json({ announcements: result.results || [] });
+      }
             // ADMIN DASHBOARD API
       if (url.pathname.startsWith("/api/admin/") &&
           !["/api/admin/login", "/api/admin/session", "/api/admin/logout"].includes(url.pathname)) {
