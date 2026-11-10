@@ -697,7 +697,51 @@ $("paidMockPublished").textContent = d.paidPublished;
 $("paidMockDrafts").textContent = d.paidDrafts;
   } catch (e) { console.error(e); }
 }
+async function loadPaidMocks() {
+  const list = $("paidMocksList");
+  const status = $("paidMocksStatus");
 
+  try {
+    status.textContent = "Loading paid mocks...";
+
+    const d = await api("/api/admin/paid-mocks");
+
+    status.textContent = `${d.mocks.length} paid mock(s) found`;
+
+    list.innerHTML = d.mocks.length
+      ? `
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Scheduled Date</th>
+              <th>Duration</th>
+              <th>Subjects</th>
+              <th>Questions</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${d.mocks.map(m => `
+              <tr>
+                <td>${escapeHTML(m.title)}</td>
+                <td>${escapeHTML(m.scheduled_date)}</td>
+                <td>${m.duration_minutes} mins</td>
+                <td>${m.subject_count}</td>
+                <td>${m.question_count}</td>
+                <td>${escapeHTML(m.status)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `
+      : "<p class='muted'>No paid mocks created yet.</p>";
+
+  } catch (e) {
+    status.textContent = "Unable to load paid mocks.";
+    list.textContent = e.message;
+  }
+}
 async function loadMocks() {
   try {
     const d = await api("/api/admin/mocks");
