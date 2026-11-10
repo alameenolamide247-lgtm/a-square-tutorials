@@ -615,7 +615,7 @@ async function loadPaidMocks() {
           ? new Date(mock.scheduled_date).toLocaleDateString()
           : "Date to be announced";
 
-        return `
+                return `
           <article style="padding:16px 0;border-bottom:1px solid #e0e9f5;">
             <h3>${escapeHtml(mock.title)}</h3>
             <p class="muted">Date: ${escapeHtml(date)}</p>
@@ -627,6 +627,19 @@ async function loadPaidMocks() {
               mock.score !== null && mock.score !== undefined
                 ? `<p><strong>Score:</strong> ${Number(mock.score)} / ${Number(mock.total_questions) || 0}</p>`
                 : ""
+            }
+            ${
+              mock.attempt_status === "submitted" ||
+              mock.attempt_status === "expired"
+                ? '<p style="color:#168344;font-weight:700;">Examination completed</p>'
+                : `<button
+                    type="button"
+                    class="primary start-paid-mock"
+                    data-mock-id="${escapeHtml(mock.id)}"
+                    style="margin-top:12px;"
+                  >
+                    ${mock.attempt_status === "in_progress" ? "Resume Mock" : "Start Mock"}
+                  </button>`
             }
           </article>
         `;
