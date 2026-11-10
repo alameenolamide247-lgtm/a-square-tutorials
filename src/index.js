@@ -984,6 +984,48 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
 
           return json({ ok: true });
         }
+        // PAID ANNOUNCEMENTS MANAGEMENT API
+
+if (url.pathname === "/api/admin/announcements" && method === "GET") {
+  const result = await env.DB.prepare(`
+    SELECT id, title, message, is_published, created_at
+    FROM paid_announcements
+    ORDER BY created_at DESC
+  `).all();
+
+  return json({ announcements: result.results || [] });
+}
+
+if (url.pathname === "/api/admin/announcements" && method === "POST") {
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request." }, 400);
+  }
+
+  const title = String(body.title || "").trim();
+  const message = String(body.message || "").trim();
+  const isPublished = body.is_published === false ? 0 : 1;
+
+  if (title.length < 3 || title.length > 120) {
+    return json({ error: "Title must be between 3 and 120 characters." }, 400);
+  }
+
+  if (message.length < 3 || message.length > 5000) {
+    return json({ error: "Message must be between 3 and 5000 characters." }, 400);
+  }
+
+  const id = crypto.randomUUID();
+
+  await env.DB.prepare(`
+    INSERT INTO paid_announcements (id, title, message, is_published)
+    VALUES (?, ?, ?, ?)
+  `).bind(id, title, message, isPublished).run();
+
+  return json({ ok: true, id }, 201);
+}
                   // ==========================================
         // A-SQUARE VIDEOS MANAGEMENT API
 
