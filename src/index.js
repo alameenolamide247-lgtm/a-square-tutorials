@@ -570,7 +570,149 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           mocks: result.results || []
         });
       }
-      
+            // START A PAID MOCK ATTEMPT
+      if (
+        url.pathname === "/api/paid/mocks/start" &&
+        method === "POST"
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({
+            error: "Your session is invalid or your access is inactive."
+          }, 401);
+        }
+
+        let body;
+
+        try {
+          body = await request.json();
+        } catch {
+          return json({ error: "Invalid request." }, 400);
+        }
+
+        const mockId = String(body.mockId || "").trim();
+
+        if (!mockId || mockId.length > 100) {
+          return json({ error: "A valid mock ID is required." }, 400);
+        }
+
+        const mock = await env.DB.prepare(`
+          SELECT
+            id,
+            title,
+            duration_minutes,
+            (SELECT COUNT(*)
+             FROM paid_mock_questions
+             WHERE mock_id = paid_mocks.id) AS question_count
+          FROM paid_mocks
+          WHERE id = ?
+            AND status = 'published'
+          LIMIT 1
+        `).bind(mockId).first();
+
+        if (!mock) {
+          return json({ error: "This mock is unavailable." }, 404);
+        }
+
+        if (!mock.question_count) {
+          return json({
+            error: "This mock has no questions yet."
+          }, 400);
+        }
+
+        const existing = await env.DB.prepare(`
+          SELECT id, started_at, deadline_at, status
+          FROM paid_mock_attempts
+          WHERE student_id = ?
+            AND mock_id = ?
+          LIMIT 1
+        `).bind(student.id, mockId).first();
+
+        if (existing) {
+          if (existing.status !== "in_progress") {
+            return json({
+              error: "You have already completed this mock.",
+              status: existing.status
+            }, 409);
+          }
+
+          return json({
+            ok: true,
+            attemptId: existing.id,
+            startedAt: existing.started_at,
+            deadlineAt: existing.deadline_at,
+            resumed: true
+          });
+        }
+
+        const now = new Date();
+        const duration = Number(mock.duration_minutes);
+
+        if (!Number.isInteger(duration) || duration < 1) {
+          return json({ error: "Invalid mock duration." }, 400);
+        }
+
+        const deadline = new Date(
+          now.getTime() + duration * 60 * 1000
+        );
+
+        const attemptId = crypto.randomUUID();
+
+        try {
+          await env.DB.prepare(`
+            INSERT INTO paid_mock_attempts (
+              id,
+              student_id,
+              mock_id,
+              started_at,
+              deadline_at,
+              status
+            )
+            VALUES (?, ?, ?, ?, ?, 'in_progress')
+          `).bind(
+            attemptId,
+            student.id,
+            mockId,
+            now.toISOString(),
+            deadline.toISOString()
+          ).run();
+        } catch (error) {
+          const created = await env.DB.prepare(`
+            SELECT id, started_at, deadline_at, status
+            FROM paid_mock_attempts
+            WHERE student_id = ?
+              AND mock_id = ?
+            LIMIT 1
+          `).bind(student.id, mockId).first();
+
+          if (created) {
+            if (created.status !== "in_progress") {
+              return json({
+                error: "You have already completed this mock."
+              }, 409);
+            }
+
+            return json({
+              ok: true,
+              attemptId: created.id,
+              startedAt: created.started_at,
+              deadlineAt: created.deadline_at,
+              resumed: true
+            });
+          }
+
+          throw error;
+        }
+
+        return json({
+          ok: true,
+          attemptId,
+          startedAt: now.toISOString(),
+          deadlineAt: deadline.toISOString(),
+          resumed: false
+        });
+      }
             // PAID STUDENT ANNOUNCEMENTS
       if (
         url.pathname === "/api/paid/announcements" &&
