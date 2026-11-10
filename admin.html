@@ -678,6 +678,9 @@ async function loadOverview() {
     $("statStudents").textContent = d.students;
     $("statAttempts").textContent = d.attempts;
     $("statCodes").textContent = d.unusedCodes;
+   $("paidMockTotal").textContent = d.paidMocks;
+$("paidMockPublished").textContent = d.paidPublished;
+$("paidMockDrafts").textContent = d.paidDrafts;
   } catch (e) { console.error(e); }
 }
 
