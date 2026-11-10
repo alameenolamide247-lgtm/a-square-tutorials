@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#073b91">
+  <title>Paid Student Portal | A² Tutorials</title>
+
+  <style>
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-regular.ttf');
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-semibold.ttf');
+      font-weight: 600;
+    }
+
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-bold.ttf');
+      font-weight: 700;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Moanslight, sans-serif;
+      background: #f3f7ff;
+      color: #092653;
+      min-height: 100vh;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    .topbar {
+      background: white;
+      padding: 16px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 15px #09265310;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #0755c9;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .back {
+      color: #0755c9;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at 85% 15%, #12c5ed55, transparent 28%),
+        linear-gradient(125deg, #041b49, #0755c9 65%, #078fd0);
+      color: white;
+      text-align: center;
+      padding: 65px 20px 75px;
+    }
+
+    .hero h1 {
+      font-size: clamp(30px, 5vw, 45px);
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: #e0f2ff;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    main {
+      max-width: 480px;
+      margin: -35px auto 0;
+      padding: 0 17px 60px;
+      position: relative;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #e0e9f5;
+      border-radius: 17px;
+      padding: 27px;
+      box-shadow: 0 10px 35px #09265312;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #edf4ff;
+      padding: 5px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+
+    .tabs button {
+      border: 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: transparent;
+      color: #64748b;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tabs button.active {
+      background: #0755c9;
+      color: white;
+    }
+
+    h2 {
+      font-size: 23px;
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: #71809b;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d3deeb;
+      border-radius: 9px;
+      margin-bottom: 17px;
+      outline: none;
+      background: white;
+      color: #092653;
+    }
+
+    input:focus {
+      border-color: #0755c9;
+      box-shadow: 0 0 0 3px #0755c915;
+    }
+
+    .primary, .whatsapp {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 9px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: linear-gradient(110deg, #0755c9, #078fd0);
+      color: white;
+    }
+
+    .primary:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .whatsapp {
+      background: #e8f8ee;
+      color: #168344;
+      margin-top: 12px;
+    }
+
+    .divider {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      margin: 17px 0;
+    }
+
+    .message {
+      display: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 15px;
+    }
+
+    .message.error {
+      display: block;
+      background: #fff0f0;
+      color: #b42318;
+    }
+
+    .message.success {
+      display: block;
+      background: #eaf8ef;
+      color: #168344;
+    }
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    footer {
+      text-align: center;
+      padding: 22px 15px;
+      color: #71809b;
+      font-size: 12px;
+    }
+
+    @media(max-width: 480px) {
+      .topbar {
+        padding: 14px 5%;
+      }
+
+      .brand {
+        font-size: 18px;
+      }
+
+      .panel {
+        padding: 21px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="./20261108_134629.png" alt="A² Tutorials Logo">
+      <span>A² TUTORIALS</span>
+    </div>
+
+    <a href="./index.html" class="back">Main Website</a>
+  </header>
+
+  <section class="hero">
+    <h1>Welcome to Your Next Level</h1>
+    <p>
+      Your dedicated learning space for focused preparation,
+      consistent practice and academic excellence.
+    </p>
+  </section>
+
+  <main>
+    <div class="panel">
+
+      <div class="tabs">
+        <button id="loginTab" class="active" type="button">
+          Login
+        </button>
+
+        <button id="signupTab" type="button">
+          Sign Up
+        </button>
+      </div>
+
+      <section id="loginSection" class="form-section active">
+        <h2>Welcome Back</h2>
+        <p class="muted">
+          Log in to continue your A² Tutorials learning journey.
+        </p>
+
+        <form id="loginForm">
+          <label for="loginEmail">Email Address</label>
+          <input
+            id="loginEmail"
+            type="email"
+            placeholder="Enter your registered email"
+            autocomplete="email"
+            required
+          >
+
+          <label for="loginStudentId">Student ID</label>
+          <input
+            id="loginStudentId"
+            type="text"
+            placeholder="ASQP-XXXXXXXXXXXXXXXX"
+            autocomplete="off"
+            required
+          >
+
+          <button class="primary" id="loginButton" type="submit">
+            Login to Portal
+          </button>
+        </form>
+
+        <div id="loginMessage" class="message"></div>
+      </section>
+
+      <section id="signupSection" class="form-section">
+        <h2>Create Your Account</h2>
+        <p class="muted">
+          Enter your details and the Student ID issued by A² Tutorials.
+        </p>
+
+        <form id="signupForm">
+          <label for="fullName">Full Name</label>
+          <input
+            id="fullName"
+            type="text"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            maxlength="100"
+            required
+          >
+
+          <label for="signupEmail">Email Address</label>
+          <input
+            id="signupEmail"
+            type="email"
+            placeholder="Enter your email address"
+            autocomplete="email"
+            required
+          >
+
+          <label for="signupStudentId">Student ID</label>
+          <input
+            id="signupStudentId"
+            type="text"
+            placeholder="Enter your A² Student ID"
+            autocomplete="off"
+            required
+          >
+
+          <button class="primary" id="signupButton" type="submit">
+            Sign Up
+          </button>
+        </form>
+
+        <div class="divider">DON'T HAVE A STUDENT ID?</div>
+
+        <a
+          class="whatsapp"
+          href="https://wa.me/2347045865800?text=Hello%20A-Square%20Tutorials%2C%20I%20would%20like%20to%20request%20a%20Paid%20Student%20Portal%20ID."
+          target="_blank"
+          rel="noopener"
+        >
+          Message A-Square for Student ID
+        </a>
+
+        <div id="signupMessage" class="message"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    © 2026 A² Tutorials. Excellence in Learning, Success in Results.
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    function showMessage(id, message, type) {
+      const box = $(id);
+      box.textContent = message;
+      box.className = "message " + type;
+    }
+
+    function switchTab(tab) {
+      const login = tab === "login";
+
+      $("loginSection").classList.toggle("active", login);
+      $("signupSection").classList.toggle("active", !login);
+
+      $("loginTab").classList.toggle("active", login);
+      $("signupTab").classList.toggle("active", !login);
+    }
+
+    $("loginTab").addEventListener("click", () => switchTab("login"));
+    $("signupTab").addEventListener("click", () => switchTab("signup"));
+
+    async function sendAuthRequest(endpoint, data) {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Something went wrong.");
+      }
+
+      return result;
+    }
+
+    $("signupForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const button = $("signupButton");
+      button.disabled = true;
+      button.textContent = "Creating Account...";
+      $("signupMessage").className = "message";
+
+      try {
+        const result = await sendAuthRequest(
+          "/api/paid/auth/signup",
+          {
+            fullName: $("fullName").value.trim(),
+            email: $("signupEmail").value.trim(),
+            studentId: $("signupStudentId").value.trim()
+          }
+        );
+
+        showMessage(
+          "signupMessage",
+          "Your account has been created successfully. Your learning dashboard is the next step.",
+          "success"
+        );
+
+        $("signupForm").reset();
+
+      } catch (error) {
+        showMessage("signupMessage", error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Sign Up";
+      }
+    });
+
+    $("loginForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const button = $("loginButton");
+      button.disabled = true;
+      button.textContent = "Logging In...";
+      $("loginMessage").className = "message";
+
+      try {
+        await sendAuthRequest(
+          "/api/paid/auth/login",
+          {
+            email: $("loginEmail").value.trim(),
+            studentId: $("loginStudentId").value.trim()
+          }
+        );
+
+        showMessage(
+          "loginMessage",
+          "Login successful. Your student dashboard is the next step.",
+          "success"
+        );
+
+        $("loginForm").reset();
+
+      } catch (error) {
+        showMessage("loginMessage", error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Login to Portal";
+      }
+    });
+  </script>
+
+</body>
+</html>
