@@ -529,7 +529,53 @@
 
       location.replace("./paid-portal.html");
     });
+async function loadAnnouncements() {
+  const container = $("announcementsList");
 
+  try {
+    const response = await fetch("/api/paid/announcements", {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Unable to load announcements.");
+    }
+
+    const announcements = result.announcements || [];
+
+    if (announcements.length === 0) {
+      container.innerHTML =
+        '<p class="muted">No announcements available at the moment.</p>';
+    } else {
+      container.innerHTML = announcements.map(item => `
+        <article style="padding:16px 0;border-bottom:1px solid #e0e9f5;">
+          <h3 style="font-size:16px;margin-bottom:7px;">${escapeHtml(item.title)}</h3>
+          <p style="font-size:14px;line-height:1.7;">${escapeHtml(item.message)}</p>
+          <small style="color:#71809b;">${new Date(item.created_at).toLocaleDateString()}</small>
+        </article>
+      `).join("");
+    }
+
+    $("announcementsPanel").hidden = false;
+
+  } catch (error) {
+    container.textContent = error.message;
+    $("announcementsPanel").hidden = false;
+  }
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
     async function startDashboard() {
       try {
         const student = await checkSession();
