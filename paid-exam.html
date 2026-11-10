@@ -1,0 +1,839 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#073b91">
+  <title>Paid Mock Examination | A² Tutorials</title>
+
+  <style>
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-regular.ttf');
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-semibold.ttf');
+      font-weight: 600;
+    }
+
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-bold.ttf');
+      font-weight: 700;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Moanslight, sans-serif;
+      background: #f3f7ff;
+      color: #092653;
+      min-height: 100vh;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .topbar {
+      background: white;
+      padding: 16px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 15px #09265310;
+    }
+
+    .brand {
+      color: #0755c9;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .back-btn {
+      background: #edf4ff;
+      color: #0755c9;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-weight: 700;
+    }
+
+    .hero {
+      background: linear-gradient(120deg, #062b70, #0755c9 70%, #078fd0);
+      color: white;
+      padding: 28px 6%;
+    }
+
+    .hero h1 {
+      font-size: clamp(23px, 4vw, 32px);
+      margin-bottom: 7px;
+    }
+
+    .hero p {
+      color: #e0f2ff;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 25px 16px 60px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 15px;
+      padding: 22px;
+      box-shadow: 0 5px 22px #0926530b;
+      margin-bottom: 20px;
+    }
+
+    .exam-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .exam-title {
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .exam-count {
+      color: #71809b;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .timer {
+      background: #edf5ff;
+      color: #0755c9;
+      padding: 12px 17px;
+      border-radius: 10px;
+      font-size: 21px;
+      font-weight: 700;
+      min-width: 115px;
+      text-align: center;
+    }
+
+    .timer.warning {
+      background: #fff0e9;
+      color: #d64b20;
+    }
+
+    .progress-track {
+      height: 7px;
+      background: #e9eff8;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #0755c9, #08a7d9);
+      transition: width .2s;
+    }
+
+    .subject-label {
+      display: inline-block;
+      background: #edf5ff;
+      color: #0755c9;
+      padding: 6px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .question-number {
+      color: #71809b;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      line-height: 1.7;
+      font-weight: 600;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .options {
+      display: grid;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px;
+      border: 1px solid #dce6f3;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .2s;
+      line-height: 1.5;
+    }
+
+    .option:hover {
+      border-color: #0755c9;
+      background: #f7faff;
+    }
+
+    .option.selected {
+      border-color: #0755c9;
+      background: #edf5ff;
+      color: #0755c9;
+      font-weight: 600;
+    }
+
+    .option input {
+      margin-top: 4px;
+      accent-color: #0755c9;
+    }
+
+    .question-navigation {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .nav-btn,
+    .submit-btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 20px;
+      font-weight: 700;
+    }
+
+    .nav-btn {
+      background: #edf4ff;
+      color: #0755c9;
+    }
+
+    .nav-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .submit-btn {
+      background: #0755c9;
+      color: white;
+    }
+
+    .submit-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .grid-btn {
+      height: 42px;
+      border: 1px solid #dce6f3;
+      background: white;
+      color: #536783;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    .grid-btn.current {
+      background: #0755c9;
+      border-color: #0755c9;
+      color: white;
+    }
+
+    .grid-btn.answered {
+      background: #e6f7ee;
+      border-color: #a8dfbd;
+      color: #168344;
+    }
+
+    .grid-btn.current.answered {
+      background: #0755c9;
+      color: white;
+      border-color: #0755c9;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      color: #71809b;
+      font-size: 12px;
+      margin-top: 15px;
+    }
+
+    .legend span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: #0755c9;
+    }
+
+    .dot.green {
+      background: #a8dfbd;
+    }
+
+    .dot.grey {
+      background: #dce6f3;
+    }
+
+    .message {
+      text-align: center;
+      padding: 50px 20px;
+      line-height: 1.7;
+    }
+
+    .message h2 {
+      color: #0755c9;
+      margin-bottom: 10px;
+    }
+
+    .message p {
+      color: #71809b;
+      margin-bottom: 20px;
+    }
+
+    .message button {
+      background: #0755c9;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: #71809b;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 15px;
+      color: #71809b;
+      font-size: 12px;
+    }
+
+    @media(max-width: 550px) {
+      .topbar {
+        padding: 14px 5%;
+      }
+
+      .brand {
+        font-size: 18px;
+      }
+
+      .panel {
+        padding: 17px;
+      }
+
+      .question-text {
+        font-size: 16px;
+      }
+
+      .nav-btn,
+      .submit-btn {
+        padding: 11px 14px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand">A² TUTORIALS</div>
+    <button class="back-btn" id="backButton" type="button">
+      Dashboard
+    </button>
+  </header>
+
+  <section class="hero">
+    <h1>Examination Room</h1>
+    <p>Stay focused. Manage your time. Give your best.</p>
+  </section>
+
+  <main>
+    <div id="loading" class="panel message">
+      Loading your examination...
+    </div>
+
+    <div id="examArea" hidden>
+
+      <section class="panel">
+        <div class="exam-info">
+          <div>
+            <div class="exam-title" id="examTitle">Paid Mock Examination</div>
+            <div class="exam-count" id="examCount"></div>
+          </div>
+
+          <div class="timer" id="timer">00:00:00</div>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="subject-label" id="subjectLabel">Subject</div>
+        <div class="question-number" id="questionNumber"></div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options" id="options"></div>
+
+        <div class="question-navigation">
+          <button class="nav-btn" id="previousButton" type="button">
+            Previous
+          </button>
+
+          <button class="nav-btn" id="nextButton" type="button">
+            Next
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Question Navigator</h3>
+        <p class="muted">
+          Select a question number to move directly to it.
+        </p>
+
+        <div class="question-grid" id="questionGrid"></div>
+
+        <div class="legend">
+          <span><i class="dot green"></i> Answered</span>
+          <span><i class="dot"></i> Current</span>
+          <span><i class="dot grey"></i> Not answered</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Submit Examination</h3>
+        <p class="muted" id="answerSummary"></p>
+
+        <button class="submit-btn" id="submitButton" type="button">
+          Submit Examination
+        </button>
+      </section>
+
+    </div>
+
+    <div id="messageArea" class="panel message" hidden></div>
+  </main>
+
+  <footer>
+    A² Tutorials · Excellence in Learning, Success in Results
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const attemptId = params.get("attempt");
+
+    const loading = document.getElementById("loading");
+    const examArea = document.getElementById("examArea");
+    const messageArea = document.getElementById("messageArea");
+
+    const examTitle = document.getElementById("examTitle");
+    const examCount = document.getElementById("examCount");
+    const timerElement = document.getElementById("timer");
+    const progressBar = document.getElementById("progressBar");
+
+    const subjectLabel = document.getElementById("subjectLabel");
+    const questionNumber = document.getElementById("questionNumber");
+    const questionText = document.getElementById("questionText");
+    const optionsElement = document.getElementById("options");
+    const questionGrid = document.getElementById("questionGrid");
+    const answerSummary = document.getElementById("answerSummary");
+
+    const previousButton = document.getElementById("previousButton");
+    const nextButton = document.getElementById("nextButton");
+    const submitButton = document.getElementById("submitButton");
+
+    let questions = [];
+    let answers = {};
+    let currentQuestion = 0;
+    let remainingSeconds = 0;
+    let timerInterval = null;
+    let submitting = false;
+
+    const storageKey = attemptId
+      ? `asq_paid_exam_${attemptId}`
+      : null;
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function showMessage(title, message, buttonText = "Return to Dashboard") {
+      loading.hidden = true;
+      examArea.hidden = true;
+      messageArea.hidden = false;
+
+      messageArea.innerHTML = `
+        <h2>${escapeHtml(title)}</h2>
+        <p>${escapeHtml(message)}</p>
+        <button type="button" onclick="location.href='./paid-dashboard.html'">
+          ${escapeHtml(buttonText)}
+        </button>
+      `;
+    }
+
+    function saveLocalAnswers() {
+      if (!storageKey) return;
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(answers));
+      } catch (error) {
+        console.warn("Unable to save answers in this browser.");
+      }
+    }
+
+    function restoreLocalAnswers() {
+      if (!storageKey) return;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+        if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+          answers = saved;
+        }
+      } catch {
+        answers = {};
+      }
+    }
+
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+
+      return [
+        String(hours).padStart(2, "0"),
+        String(minutes).padStart(2, "0"),
+        String(secs).padStart(2, "0")
+      ].join(":");
+    }
+
+    function updateTimer() {
+      timerElement.textContent = formatTime(remainingSeconds);
+
+      timerElement.classList.toggle(
+        "warning",
+        remainingSeconds <= 300
+      );
+
+      if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        submitExam(true);
+        return;
+      }
+
+      remainingSeconds--;
+    }
+
+    function startTimer() {
+      updateTimer();
+
+      timerInterval = setInterval(() => {
+        updateTimer();
+      }, 1000);
+    }
+
+    function updateSummary() {
+      const answered = Object.keys(answers).filter(id =>
+        questions.some(question => question.id === id)
+      ).length;
+
+      answerSummary.textContent =
+        `${answered} of ${questions.length} questions answered.`;
+
+      examCount.textContent =
+        `${questions.length} questions · ${answered} answered`;
+
+      progressBar.style.width =
+        `${questions.length ? (answered / questions.length) * 100 : 0}%`;
+    }
+
+    function renderGrid() {
+      questionGrid.innerHTML = "";
+
+      questions.forEach((question, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "grid-btn";
+
+        if (index === currentQuestion) {
+          button.classList.add("current");
+        }
+
+        if (answers[question.id]) {
+          button.classList.add("answered");
+        }
+
+        button.textContent = index + 1;
+
+        button.addEventListener("click", () => {
+          currentQuestion = index;
+          renderQuestion();
+        });
+
+        questionGrid.appendChild(button);
+      });
+    }
+
+    function renderQuestion() {
+      const question = questions[currentQuestion];
+
+      if (!question) return;
+
+      subjectLabel.textContent = question.subject || "General";
+      questionNumber.textContent =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+      questionText.textContent = question.questionText || "";
+
+      optionsElement.innerHTML = "";
+
+      const optionEntries = Object.entries(question.options || {});
+
+      optionEntries.forEach(([key, value]) => {
+        const label = document.createElement("label");
+        label.className = "option";
+
+        if (answers[question.id] === key) {
+          label.classList.add("selected");
+        }
+
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = `question_${question.id}`;
+        radio.value = key;
+        radio.checked = answers[question.id] === key;
+
+        radio.addEventListener("change", () => {
+          answers[question.id] = key;
+          saveLocalAnswers();
+          renderQuestion();
+        });
+
+        const text = document.createElement("span");
+        text.textContent = `${key}. ${value}`;
+
+        label.appendChild(radio);
+        label.appendChild(text);
+
+        optionsElement.appendChild(label);
+      });
+
+      previousButton.disabled = currentQuestion === 0;
+      nextButton.disabled = currentQuestion === questions.length - 1;
+
+      renderGrid();
+      updateSummary();
+    }
+
+    previousButton.addEventListener("click", () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      }
+    });
+
+    async function submitExam(automatic = false) {
+      if (submitting) return;
+
+      if (!automatic) {
+        const unanswered = questions.length -
+          Object.keys(answers).filter(id =>
+            questions.some(question => question.id === id)
+          ).length;
+
+        const confirmation = unanswered > 0
+          ? `You still have ${unanswered} unanswered question(s). Submit anyway?`
+          : "Are you sure you want to submit your examination?";
+
+        if (!confirm(confirmation)) return;
+      }
+
+      submitting = true;
+      clearInterval(timerInterval);
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+
+      previousButton.disabled = true;
+      nextButton.disabled = true;
+
+      const answerList = questions
+        .filter(question => answers[question.id])
+        .map(question => ({
+          questionId: question.id,
+          selectedOption: answers[question.id]
+        }));
+
+      try {
+        const response = await fetch(
+          `/api/paid/attempt/${encodeURIComponent(attemptId)}/submit`,
+          {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              answers: answerList
+            })
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Unable to submit your examination."
+          );
+        }
+
+        if (storageKey) {
+          localStorage.removeItem(storageKey);
+        }
+
+        showMessage(
+          "Examination Submitted",
+          "Your answers have been submitted successfully. You can return to your dashboard."
+        );
+
+      } catch (error) {
+        submitting = false;
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Examination";
+
+        if (remainingSeconds > 0) {
+          timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        alert(error.message);
+      }
+    }
+
+    submitButton.addEventListener("click", () => {
+      submitExam(false);
+    });
+
+    document.getElementById("backButton").addEventListener("click", () => {
+      if (confirm("Leave the examination and return to your dashboard?")) {
+        location.href = "./paid-dashboard.html";
+      }
+    });
+
+    window.addEventListener("beforeunload", event => {
+      if (!submitting && !examArea.hidden) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    });
+
+    async function loadExam() {
+      if (!attemptId) {
+        showMessage(
+          "Examination Not Found",
+          "No examination attempt was provided. Return to your dashboard and start your mock again."
+        );
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/paid/attempt/${encodeURIComponent(attemptId)}/questions`,
+          {
+            method: "GET",
+            credentials: "same-origin"
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Unable to load this examination."
+          );
+        }
+
+        if (!Array.isArray(result.questions) || !result.questions.length) {
+          throw new Error("There are no questions available for this examination.");
+        }
+
+        questions = result.questions;
+        remainingSeconds = Math.max(
+          0,
+          Number(result.remainingSeconds) || 0
+        );
+
+        examTitle.textContent = result.title || "Paid Mock Examination";
+
+        restoreLocalAnswers();
+
+        loading.hidden = true;
+        examArea.hidden = false;
+
+        renderQuestion();
+        startTimer();
+
+      } catch (error) {
+        showMessage(
+          "Unable to Load Examination",
+          error.message
+        );
+      }
+    }
+
+    loadExam();
+  </script>
+
+</body>
+</html>
