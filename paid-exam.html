@@ -818,6 +818,17 @@
 
         restoreLocalAnswers();
 
+questions.forEach(question => {
+  if (
+    question.selectedOption &&
+    !answers[question.id]
+  ) {
+    answers[question.id] = question.selectedOption;
+  }
+});
+
+saveLocalAnswers();
+
         loading.hidden = true;
         examArea.hidden = false;
 
