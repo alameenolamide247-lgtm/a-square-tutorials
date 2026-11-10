@@ -565,20 +565,25 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
 
         // Dashboard statistics
         if (url.pathname === "/api/admin/overview" && method === "GET") {
-          const [mocks, students, attempts, codes] = await Promise.all([
-            env.DB.prepare("SELECT COUNT(*) AS count FROM mocks").first(),
-            env.DB.prepare("SELECT COUNT(*) AS count FROM students").first(),
-            env.DB.prepare("SELECT COUNT(*) AS count FROM attempts").first(),
-            env.DB.prepare("SELECT COUNT(*) AS count FROM access_codes WHERE is_active = 1 AND redeemed_at IS NULL").first()
-          ]);
+          const [mocks, students, attempts, codes, paidMocks, paidPublished, paidDrafts] = await Promise.all([
+  env.DB.prepare("SELECT COUNT(*) AS count FROM mocks").first(),
+  env.DB.prepare("SELECT COUNT(*) AS count FROM students").first(),
+  env.DB.prepare("SELECT COUNT(*) AS count FROM attempts").first(),
+  env.DB.prepare("SELECT COUNT(*) AS count FROM access_codes WHERE is_active = 1 AND redeemed_at IS NULL").first(),
+  env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks").first(),
+  env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks WHERE status = 'published'").first(),
+  env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks WHERE status = 'draft'").first()
+]);
 
-          return json({
-            mocks: mocks?.count || 0,
-            students: students?.count || 0,
-            attempts: attempts?.count || 0,
-            unusedCodes: codes?.count || 0
-          });
-        }
+return json({
+  mocks: mocks?.count || 0,
+  students: students?.count || 0,
+  attempts: attempts?.count || 0,
+  unusedCodes: codes?.count || 0,
+  paidMocks: paidMocks?.count || 0,
+  paidPublished: paidPublished?.count || 0,
+  paidDrafts: paidDrafts?.count || 0
+});
 
         // List all mocks
         if (url.pathname === "/api/admin/mocks" && method === "GET") {
