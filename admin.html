@@ -871,6 +871,62 @@ async function loadPaidQuestionSubjects(mockId) {
     status.textContent = e.message;
   }
 });
+ 
+$("savePaidQuestionBtn").addEventListener("click", async () => {
+  const subjectId = $("paidQuestionSubject").value;
+  const questionText = $("paidQuestionText").value.trim();
+
+  const options = {
+    A: $("paidOptionA").value.trim(),
+    B: $("paidOptionB").value.trim(),
+    C: $("paidOptionC").value.trim(),
+    D: $("paidOptionD").value.trim()
+  };
+
+  const correctOption = $("paidCorrectOption").value;
+  const explanation = $("paidQuestionExplanation").value.trim();
+  const status = $("paidQuestionStatus");
+
+  if (!selectedPaidMockId || !subjectId || !questionText ||
+      !options.A || !options.B || !options.C || !options.D ||
+      !correctOption) {
+    status.textContent =
+      "Complete the question, all four options and correct answer.";
+    return;
+  }
+
+  try {
+    status.textContent = "Saving question...";
+
+    await api("/api/admin/paid-mock-questions", {
+      method: "POST",
+      body: JSON.stringify({
+        mock_id: selectedPaidMockId,
+        subject_id: subjectId,
+        question_text: questionText,
+        options,
+        correct_option: correctOption,
+        explanation
+      })
+    });
+
+    status.textContent = "Question saved successfully!";
+
+    $("paidQuestionText").value = "";
+    $("paidOptionA").value = "";
+    $("paidOptionB").value = "";
+    $("paidOptionC").value = "";
+    $("paidOptionD").value = "";
+    $("paidCorrectOption").value = "";
+    $("paidQuestionExplanation").value = "";
+
+    await loadPaidMocks();
+
+  } catch (error) {
+    status.textContent = error.message;
+  }
+});
+ 
 async function loadMocks() {
   try {
     const d = await api("/api/admin/mocks");
