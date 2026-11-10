@@ -801,6 +801,130 @@ if (url.pathname === "/api/admin/logout" && method === "POST") {
           questions
         });
       }
+            // SUBMIT A PAID MOCK ATTEMPT
+      const paidSubmitMatch = url.pathname.match(
+        /^\/api\/paid\/attempt\/([a-f0-9-]+)\/submit$/
+      );
+
+      if (paidSubmitMatch && method === "POST") {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({ error: "Your session is invalid or inactive." }, 401);
+        }
+
+        const attemptId = paidSubmitMatch[1];
+
+        let body;
+
+        try {
+          body = await request.json();
+        } catch {
+          return json({ error: "Invalid submission data." }, 400);
+        }
+
+        if (!Array.isArray(body.answers)) {
+          return json({ error: "Answers must be provided." }, 400);
+        }
+
+        const attempt = await env.DB.prepare(`
+          SELECT id, mock_id, deadline_at, status
+          FROM paid_mock_attempts
+          WHERE id = ?
+            AND student_id = ?
+          LIMIT 1
+        `).bind(attemptId, student.id).first();
+
+        if (!attempt) {
+          return json({ error: "Examination attempt not found." }, 404);
+        }
+
+        if (attempt.status !== "in_progress") {
+          return json({ error: "This examination has already ended." }, 409);
+        }
+
+        const questionsResult = await env.DB.prepare(`
+          SELECT id, correct_option
+          FROM paid_mock_questions
+          WHERE mock_id = ?
+        `).bind(attempt.mock_id).all();
+
+        const questions = questionsResult.results || [];
+        const questionMap = new Map(
+          questions.map(question => [question.id, question.correct_option])
+        );
+
+        const now = Date.now();
+        const deadline = new Date(attempt.deadline_at).getTime();
+        const expired = now > deadline;
+
+        const submittedAnswers = expired ? [] : body.answers;
+        const seen = new Set();
+        let score = 0;
+
+        for (const answer of submittedAnswers) {
+          if (
+            !answer ||
+            typeof answer.questionId !== "string" ||
+            typeof answer.selectedOption !== "string" ||
+            seen.has(answer.questionId) ||
+            !questionMap.has(answer.questionId)
+          ) {
+            return json({ error: "Invalid answer data." }, 400);
+          }
+
+          seen.add(answer.questionId);
+
+          if (
+            answer.selectedOption ===
+            questionMap.get(answer.questionId)
+          ) {
+            score++;
+          }
+        }
+
+        const statements = submittedAnswers.map(answer =>
+          env.DB.prepare(`
+            INSERT INTO paid_mock_answers
+              (attempt_id, question_id, selected_option, answered_at)
+            VALUES (?, ?, ?, datetime('now'))
+            ON CONFLICT(attempt_id, question_id)
+            DO UPDATE SET
+              selected_option = excluded.selected_option,
+              answered_at = excluded.answered_at
+          `).bind(
+            attemptId,
+            answer.questionId,
+            answer.selectedOption
+          )
+        );
+
+        statements.push(
+          env.DB.prepare(`
+            UPDATE paid_mock_attempts
+            SET status = ?,
+                submitted_at = datetime('now'),
+                score = ?,
+                total_questions = ?
+            WHERE id = ?
+              AND status = 'in_progress'
+          `).bind(
+            expired ? "expired" : "submitted",
+            score,
+            questions.length,
+            attemptId
+          )
+        );
+
+        await env.DB.batch(statements);
+
+        return json({
+          ok: true,
+          status: expired ? "expired" : "submitted",
+          score,
+          totalQuestions: questions.length
+        });
+      }
             // PAID STUDENT ANNOUNCEMENTS
       if (
         url.pathname === "/api/paid/announcements" &&
