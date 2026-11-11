@@ -1728,9 +1728,22 @@ if (
     }
   }
 
-  await env.DB.prepare(`
-    UPDATE paid_mocks SET status = ? WHERE id = ?
-  `).bind(status, mockId).run();
+    await env.DB.prepare(`
+    UPDATE paid_mocks
+    SET
+      status = ?,
+      published_at = CASE
+        WHEN ? = 'published'
+        THEN COALESCE(published_at, CURRENT_TIMESTAMP)
+        ELSE published_at
+      END,
+      unpublished_at = CASE
+        WHEN ? = 'published' THEN NULL
+        WHEN published_at IS NOT NULL THEN CURRENT_TIMESTAMP
+        ELSE unpublished_at
+      END
+    WHERE id = ?
+  `).bind(status, status, status, mockId).run();
 
   return json({ ok: true, status });
 }
