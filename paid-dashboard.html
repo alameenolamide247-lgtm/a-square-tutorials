@@ -962,6 +962,7 @@ async function loadAnnouncements() {
   }
 }
 
+
 async function loadWeakSubjectAnalysis() {
   const container = $("weakSubjectAnalysis");
 
@@ -987,54 +988,157 @@ async function loadWeakSubjectAnalysis() {
     if (subjects.length === 0) {
       container.innerHTML = `
         <p class="muted">
-          Complete a mock to see your subject analysis here.
+          Your subject analysis is not available yet.
         </p>
       `;
       return;
     }
 
-    container.innerHTML = subjects.map(subject => {
-      const total = Number(subject.total_questions) || 0;
-      const correct = Number(subject.correct_answers) || 0;
-      const accuracy = Math.max(
-        0,
-        Math.min(100, Number(subject.accuracy) || 0)
-      );
+    container.innerHTML = `
+      ${subjects.map(subject => {
+        const total = Number(subject.total_questions) || 0;
+        const correct = Number(subject.correct_answers) || 0;
+        const hasAttempts = total > 0;
 
-      return `
-        <div style="margin-bottom:20px;">
-          <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:10px;
-            flex-wrap:wrap;
-            margin-bottom:7px;
-          ">
-            <strong>${escapeHtml(subject.subject_name)}</strong>
+        const accuracy = hasAttempts
+          ? Math.max(
+              0,
+              Math.min(
+                100,
+                subject.accuracy == null
+                  ? (correct / total) * 100
+                  : Number(subject.accuracy)
+              )
+            )
+          : null;
 
-            <span style="font-size:13px;">
-              ${correct}/${total} correct · ${accuracy.toFixed(1)}%
-            </span>
-          </div>
+        let color = "#94a3b8";
+        let label = "No questions answered";
 
-          <div style="
-            width:100%;
-            height:10px;
-            background:#dce8f7;
-            border-radius:20px;
-            overflow:hidden;
-          ">
+        if (hasAttempts) {
+          if (accuracy < 20) {
+            color = "#dc2626";
+            label = "Needs serious improvement";
+          } else if (accuracy < 50) {
+            color = "#f97316";
+            label = "Needs improvement";
+          } else if (accuracy < 70) {
+            color = "#2563eb";
+            label = "Good progress";
+          } else if (accuracy < 100) {
+            color = "#16a34a";
+            label = "Excellent";
+          } else {
+            color = "#16a34a";
+            label = "Perfect";
+          }
+        }
+
+        return `
+          <div style="margin-bottom:24px;">
             <div style="
-              width:${accuracy}%;
-              height:100%;
-              background:#2376e8;
+              display:flex;
+              justify-content:space-between;
+              align-items:center;
+              gap:10px;
+              flex-wrap:wrap;
+              margin-bottom:7px;
+            ">
+              <strong>${escapeHtml(subject.subject_name)}</strong>
+
+              <span style="
+                font-size:14px;
+                font-weight:600;
+                color:${color};
+              ">
+                ${hasAttempts ? accuracy.toFixed(1) + "%" : "—"}
+              </span>
+            </div>
+
+            <div style="
+              display:flex;
+              align-items:center;
+              gap:7px;
+              margin-bottom:8px;
+              font-size:13px;
+            ">
+              <span>${correct}/${total} correct</span>
+              <span style="color:${color};">•</span>
+              <strong style="color:${color};">
+                ${label}
+              </strong>
+            </div>
+
+            <div style="
+              width:100%;
+              height:10px;
+              background:#e2e8f0;
               border-radius:20px;
-            "></div>
+              overflow:hidden;
+            ">
+              <div style="
+                width:${hasAttempts ? accuracy : 0}%;
+                height:100%;
+                background:${hasAttempts ? color : "transparent"};
+                border-radius:20px;
+              "></div>
+            </div>
           </div>
+        `;
+      }).join("")}
+
+      <div style="
+        margin-top:25px;
+        padding:15px;
+        background:#f8fafc;
+        border-radius:12px;
+      ">
+        <strong style="
+          display:block;
+          margin-bottom:12px;
+          font-size:14px;
+        ">
+          Performance Guide
+        </strong>
+
+        <div style="
+          display:flex;
+          flex-wrap:wrap;
+          gap:12px 18px;
+          font-size:12px;
+        ">
+          <span>
+            <span style="color:#dc2626;">●</span>
+            Below 20% — Needs serious improvement
+          </span>
+
+          <span>
+            <span style="color:#f97316;">●</span>
+            20%–49.9% — Needs improvement
+          </span>
+
+          <span>
+            <span style="color:#2563eb;">●</span>
+            50%–69.9% — Good progress
+          </span>
+
+          <span>
+            <span style="color:#16a34a;">●</span>
+            70%–99.9% — Excellent
+          </span>
+
+          <span>
+            <span style="color:#16a34a;">●</span>
+            100% — Perfect
+          </span>
+
+          <span>
+            <span style="color:#94a3b8;">●</span>
+            0/0 — No questions answered
+          </span>
         </div>
-      `;
-    }).join("");
+      </div>
+    `;
 
   } catch (error) {
     container.textContent =
@@ -1042,9 +1146,8 @@ async function loadWeakSubjectAnalysis() {
 
     console.error("Weak-subject analysis:", error);
   }
-
+}
     
-    }
     let calendarDate = new Date();
     let calendarMocks = [];
 
