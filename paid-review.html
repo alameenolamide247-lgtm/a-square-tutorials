@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#073b91">
+  <title>Answer Review | A² Tutorials</title>
+  <style>
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-regular.ttf');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-semibold.ttf');
+      font-weight: 600;
+    }
+    @font-face {
+      font-family: Moanslight;
+      src: url('./moanslight-bold.ttf');
+      font-weight: 700;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Moanslight, sans-serif;
+      background: #f3f7ff;
+      color: #092653;
+      min-height: 100vh;
+    }
+    header {
+      background: white;
+      padding: 18px 6%;
+      box-shadow: 0 2px 15px #09265310;
+      color: #0755c9;
+      font-size: 21px;
+      font-weight: 700;
+    }
+    main {
+      max-width: 850px;
+      margin: auto;
+      padding: 30px 17px 60px;
+    }
+    .panel, .question-card {
+      background: white;
+      border: 1px solid #e0e9f5;
+      border-radius: 15px;
+      padding: 22px;
+      margin-bottom: 17px;
+      box-shadow: 0 6px 25px #09265308;
+    }
+    h1 { font-size: 27px; margin-bottom: 8px; }
+    h2 { font-size: 19px; margin-bottom: 13px; }
+    .muted { color: #71809b; font-size: 13px; line-height: 1.6; }
+    .subject {
+      color: #0755c9;
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .question-text { line-height: 1.7; margin-bottom: 15px; }
+    .option {
+      padding: 12px;
+      border: 1px solid #e0e9f5;
+      border-radius: 9px;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .selected { border: 2px solid #0755c9; background: #edf5ff; }
+    .correct { border: 2px solid #168344; background: #edfff3; }
+    .wrong { border: 2px solid #c0392b; background: #fff1ef; }
+    .status {
+      font-weight: 700;
+      margin: 14px 0;
+      font-size: 14px;
+    }
+    .explanation {
+      background: #f3f7ff;
+      padding: 13px;
+      border-radius: 9px;
+      margin-top: 13px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .back {
+      display: inline-block;
+      background: #0755c9;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 9px;
+      text-decoration: none;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+    #message { padding: 18px 0; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <header>A² Tutorials</header>
+  <main>
+    <section class="panel">
+      <h1>Answer Review</h1>
+      <p class="muted">Review your selected answers, correct answers and explanations.</p>
+      <a class="back" href="./paid-dashboard.html">Back to Dashboard</a>
+      <p id="message">Loading your answers...</p>
+    </section>
+    <section id="reviewList"></section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const attemptId = params.get("attempt");
+    const message = document.getElementById("message");
+    const reviewList = document.getElementById("reviewList");
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function optionLabel(key, value) {
+      if (typeof value === "string") return value;
+      return String(value ?? key);
+    }
+
+    async function loadReview() {
+      if (!attemptId) {
+        message.textContent = "No examination attempt was specified.";
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/paid/attempt/${encodeURIComponent(attemptId)}/review`,
+          {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store"
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to load answer review.");
+        }
+
+        const reviews = data.reviews || [];
+
+        if (!reviews.length) {
+          message.textContent = "No questions were found for this examination.";
+          return;
+        }
+
+        message.textContent = `${reviews.length} questions reviewed.`;
+
+        reviewList.innerHTML = reviews.map((question, index) => {
+          const options = question.options || {};
+          const selected = question.selectedOption;
+          const correct = question.correctOption;
+
+          const optionHtml = Object.entries(options).map(([key, value]) => {
+            const isSelected = key === selected;
+            const isCorrect = key === correct;
+            let classes = "option";
+
+            if (isCorrect) classes += " correct";
+            else if (isSelected) classes += " wrong";
+
+            return `
+              <div class="${classes}">
+                <strong>${escapeHtml(key)}.</strong>
+                ${escapeHtml(optionLabel(key, value))}
+                ${isSelected ? " — Your answer" : ""}
+                ${isCorrect ? " — Correct answer" : ""}
+              </div>
+            `;
+          }).join("");
+
+          return `
+            <article class="question-card">
+              <p class="subject">${escapeHtml(question.subject)}</p>
+              <h2>Question ${index + 1}</h2>
+              <p class="question-text">${escapeHtml(question.questionText)}</p>
+              ${optionHtml}
+              <p class="status" style="color:${question.isCorrect ? "#168344" : "#c0392b"}">
+                ${question.isCorrect ? "Correct" : "Incorrect"}
+              </p>
+              ${
+                question.explanation
+                  ? `<div class="explanation"><strong>Explanation:</strong><br>${escapeHtml(question.explanation)}</div>`
+                  : ""
+              }
+            </article>
+          `;
+        }).join("");
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    }
+
+    loadReview();
+  </script>
+</body>
+</html>
