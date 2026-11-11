@@ -604,6 +604,7 @@ if (
              WHERE q.mock_id = m.id) AS question_count,
             a.status AS attempt_status,
 m.results_released,
+m.review_mode,
 CASE WHEN m.results_released = 1 THEN a.score ELSE NULL END AS score,
 CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_questions
           FROM paid_mocks m
