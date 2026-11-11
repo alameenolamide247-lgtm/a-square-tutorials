@@ -338,7 +338,17 @@
         Complete your academic profile so A² Tutorials can tailor
         your learning experience and track your progress.
       </p>
+<div id="profileSummary" hidden>
+  <h3 style="margin-bottom:15px;">Your Academic Profile</h3>
+  <p><strong>Subjects:</strong> <span id="savedSubjects"></span></p>
+  <p><strong>Dream JAMB Score:</strong> <span id="savedDreamScore"></span></p>
+  <p><strong>Aspiring Course:</strong> <span id="savedCourse"></span></p>
+  <p><strong>Aspiring University:</strong> <span id="savedUniversity"></span></p>
 
+  <button type="button" class="primary" id="editProfileButton" style="margin-top:15px;">
+    Edit Profile
+  </button>
+</div>
       <form id="profileForm">
         <label for="fullName">Full Name</label>
         <input id="fullName" type="text" readonly>
