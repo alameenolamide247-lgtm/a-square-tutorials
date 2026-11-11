@@ -1069,6 +1069,91 @@ if (Date.now() >= deadline) {
           message: "Your examination has been submitted."
         });
       }
+            // REVIEW ANSWERS FOR A PAID MOCK ATTEMPT
+      const paidReviewMatch = url.pathname.match(
+        /^\/api\/paid\/attempt\/([a-f0-9-]+)\/review$/
+      );
+
+      if (paidReviewMatch && method === "GET") {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({ error: "Your session is invalid or inactive." }, 401);
+        }
+
+        const attemptId = paidReviewMatch[1];
+
+        const attempt = await env.DB.prepare(`
+          SELECT
+            a.id,
+            a.mock_id,
+            a.status,
+            m.results_released,
+            m.review_mode
+          FROM paid_mock_attempts a
+          JOIN paid_mocks m ON m.id = a.mock_id
+          WHERE a.id = ?
+            AND a.student_id = ?
+          LIMIT 1
+        `).bind(attemptId, student.id).first();
+
+        if (!attempt) {
+          return json({ error: "Examination attempt not found." }, 404);
+        }
+
+        if (!["submitted", "expired"].includes(attempt.status)) {
+          return json({ error: "You can only review a completed examination." }, 409);
+        }
+
+        if (
+          attempt.review_mode !== "immediate" &&
+          Number(attempt.results_released) !== 1
+        ) {
+          return json({ error: "Answer review is not available yet." }, 403);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT
+            q.id,
+            q.question_text,
+            q.options_json,
+            q.correct_option,
+            q.explanation,
+            s.subject_name,
+            a.selected_option
+          FROM paid_mock_questions q
+          JOIN paid_mock_subjects s ON s.id = q.subject_id
+          LEFT JOIN paid_mock_answers a
+            ON a.question_id = q.id
+            AND a.attempt_id = ?
+          WHERE q.mock_id = ?
+          ORDER BY s.sort_order ASC, q.sort_order ASC
+        `).bind(attemptId, attempt.mock_id).all();
+
+        const reviews = (result.results || []).map(question => {
+          let options = {};
+
+          try {
+            options = JSON.parse(question.options_json || "{}");
+          } catch {
+            options = {};
+          }
+
+          return {
+            id: question.id,
+            questionText: question.question_text,
+            options,
+            subject: question.subject_name,
+            selectedOption: question.selected_option || null,
+            correctOption: question.correct_option,
+            explanation: question.explanation || "",
+            isCorrect:
+              question.selected_option === question.correct_option
+          };
+        });
+
+        return json({ reviews });
+      }
             // PAID STUDENT ANNOUNCEMENTS
       if (
         url.pathname === "/api/paid/announcements" &&
@@ -1685,7 +1770,8 @@ if (
     ok: true,
     results_released: resultsReleased
   });
-}       
+}   
+        
         if (url.pathname === "/api/admin/paid-mock-questions" && method === "POST") {
   let body;
 
