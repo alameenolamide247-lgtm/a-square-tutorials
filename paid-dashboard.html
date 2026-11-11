@@ -777,6 +777,7 @@ $("savedUniversity").textContent =
   profile.aspiringUniversity || "Not set";
 
 if (profile.profileCompleted) {
+  $("profileHeading").textContent = "Your Student Profile";
   $("profileSummary").hidden = false;
   $("profileForm").hidden = true;
 } else {
