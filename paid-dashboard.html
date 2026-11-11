@@ -793,11 +793,11 @@ async function loadAnnouncements() {
         $("completedMocksCount").textContent =
           result.completedMocks;
 
-        $("averageMockScore").textContent =
-          `${Number(result.averageScore).toFixed(1)}%`;
+                $("averageMockScore").textContent =
+          `${Number(result.averageScore).toFixed(0)}/400`;
 
         $("highestMockScore").textContent =
-          `${Number(result.highestScore).toFixed(1)}%`;
+          `${Number(result.highestScore).toFixed(0)}/400`;
 
       } catch (error) {
         $("completedMocksCount").textContent = "—";
