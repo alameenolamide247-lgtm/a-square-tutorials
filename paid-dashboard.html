@@ -750,6 +750,30 @@ function escapeHtml(value) {
               if (checkbox) checkbox.checked = true;
             });
         }
+        $("savedSubjects").textContent =
+  (profile.subjects || []).join(", ");
+
+$("savedDreamScore").textContent =
+  profile.dreamScore || "Not set";
+
+$("savedCourse").textContent =
+  profile.aspiringCourse || "Not set";
+
+$("savedUniversity").textContent =
+  profile.aspiringUniversity || "Not set";
+
+if (profile.profileCompleted) {
+  $("profileSummary").hidden = false;
+  $("profileForm").hidden = true;
+} else {
+  $("profileSummary").hidden = true;
+  $("profileForm").hidden = false;
+}
+
+$("editProfileButton").addEventListener("click", () => {
+  $("profileSummary").hidden = true;
+  $("profileForm").hidden = false;
+});
 
         $("welcomeHeading").textContent =
           `Welcome, ${student.fullName}`;
