@@ -734,7 +734,8 @@ CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_q
           progress: result.results || []
         });
       }
-            // LOAD STUDENT WEAK-SUBJECT ANALYSIS
+
+      // LOAD STUDENT WEAK-SUBJECT ANALYSIS
       if (
         url.pathname === "/api/paid/weak-subject-analysis" &&
         method === "GET"
@@ -747,50 +748,141 @@ CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_q
           }, 401);
         }
 
+        let studentSubjects = [];
+
+        try {
+          studentSubjects = JSON.parse(
+            student.subjects_json || "[]"
+          );
+        } catch {
+          studentSubjects = [];
+        }
+
+        const allowedSubjects = [
+          "Mathematics",
+          "Physics",
+          "Chemistry",
+          "Biology"
+        ];
+
+        const optionalSubjects = Array.isArray(studentSubjects)
+          ? [...new Set(
+              studentSubjects.filter(subject =>
+                allowedSubjects.includes(subject)
+              )
+            )]
+          : [];
+
+        if (optionalSubjects.length !== 3) {
+          return json({
+            error: "Your registered subjects could not be loaded."
+          }, 400);
+        }
+
+        const selectedSubjects = [
+          ...optionalSubjects,
+          "Use of English"
+        ];
+
+        const subjectValues = selectedSubjects
+          .map(() => "(?)")
+          .join(", ");
+
         const result = await env.DB.prepare(`
+          WITH selected_subjects(subject_name) AS (
+            VALUES ${subjectValues}
+          )
           SELECT
-            s.subject_name,
-            COUNT(q.id) AS total_questions,
-            SUM(
+            selected_subjects.subject_name,
+
+            COUNT(
               CASE
-                WHEN ans.selected_option = q.correct_option
-                THEN 1
-                ELSE 0
+                WHEN a.id IS NOT NULL THEN q.id
               END
-            ) AS correct_answers,
-            ROUND(
+            ) AS total_questions,
+
+            COALESCE(
               SUM(
                 CASE
-                  WHEN ans.selected_option = q.correct_option
+                  WHEN a.id IS NOT NULL
+                    AND ans.selected_option = q.correct_option
                   THEN 1
                   ELSE 0
                 END
-              ) * 100.0 / COUNT(q.id),
-              1
-            ) AS accuracy
-          FROM paid_mock_attempts a
-          INNER JOIN paid_mock_questions q
-            ON q.mock_id = a.mock_id
-          INNER JOIN paid_mock_subjects s
-            ON s.id = q.subject_id
+              ),
+              0
+            ) AS correct_answers,
+
+            CASE
+              WHEN COUNT(
+                CASE
+                  WHEN a.id IS NOT NULL THEN q.id
+                END
+              ) = 0
+              THEN NULL
+
+              ELSE ROUND(
+                COALESCE(
+                  SUM(
+                    CASE
+                      WHEN a.id IS NOT NULL
+                        AND ans.selected_option = q.correct_option
+                      THEN 1
+                      ELSE 0
+                    END
+                  ),
+                  0
+                ) * 100.0 /
+                COUNT(
+                  CASE
+                    WHEN a.id IS NOT NULL THEN q.id
+                  END
+                ),
+                1
+              )
+            END AS accuracy
+
+          FROM selected_subjects
+
+          LEFT JOIN paid_mock_subjects s
+            ON s.subject_name = selected_subjects.subject_name
+
+          LEFT JOIN paid_mock_questions q
+            ON q.subject_id = s.id
+
+          LEFT JOIN paid_mock_attempts a
+            ON a.mock_id = q.mock_id
+            AND a.student_id = ?
+            AND a.status IN ('submitted', 'expired')
+
           LEFT JOIN paid_mock_answers ans
             ON ans.attempt_id = a.id
             AND ans.question_id = q.id
-          WHERE
-            a.student_id = ?
-            AND a.status IN ('submitted', 'expired')
-          GROUP BY
-            s.id,
-            s.subject_name
+
+          GROUP BY selected_subjects.subject_name
+
           ORDER BY
+            CASE
+              WHEN COUNT(
+                CASE
+                  WHEN a.id IS NOT NULL THEN q.id
+                END
+              ) = 0
+              THEN 1
+              ELSE 0
+            END ASC,
             accuracy ASC,
-            s.subject_name ASC
-        `).bind(student.id).all();
+            selected_subjects.subject_name ASC
+        `).bind(
+          ...selectedSubjects,
+          student.id
+        ).all();
 
         return json({
           subjects: result.results || []
         });
       }
+      
             // START A PAID MOCK ATTEMPT
       if (
         url.pathname === "/api/paid/mocks/start" &&
