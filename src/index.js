@@ -620,6 +620,41 @@ CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_q
           mocks: result.results || []
         });
       }
+      
+      // LOAD STUDENT PERFORMANCE CALENDAR DATA
+      if (
+        url.pathname === "/api/paid/performance-calendar" &&
+        method === "GET"
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({
+            error: "Your session is invalid or your access is inactive."
+          }, 401);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT
+            m.id,
+            m.title,
+            m.scheduled_date,
+            a.status AS attempt_status
+          FROM paid_mocks m
+          LEFT JOIN paid_mock_attempts a
+            ON a.mock_id = m.id
+            AND a.student_id = ?
+          WHERE
+            m.published_at IS NOT NULL
+            OR m.status = 'published'
+          ORDER BY m.scheduled_date ASC
+        `).bind(student.id).all();
+
+        return json({
+          mocks: result.results || []
+        });
+      }
+      
             // START A PAID MOCK ATTEMPT
       if (
         url.pathname === "/api/paid/mocks/start" &&
