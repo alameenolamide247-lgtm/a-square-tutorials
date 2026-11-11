@@ -956,11 +956,12 @@ async function loadAnnouncements() {
       </p>
     `;
 
-  } catch (error) {
+    } catch (error) {
     chart.textContent = error.message;
     console.error("Performance progress:", error);
   }
-      
+}
+
 async function loadWeakSubjectAnalysis() {
   const container = $("weakSubjectAnalysis");
 
