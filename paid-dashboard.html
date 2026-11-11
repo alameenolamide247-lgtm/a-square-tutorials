@@ -637,7 +637,19 @@ async function loadPaidMocks() {
             ${
               mock.attempt_status === "submitted" ||
               mock.attempt_status === "expired"
-                ? '<p style="color:#168344;font-weight:700;">Examination completed</p>'
+                ? `
+  <p style="color:#168344;font-weight:700;">Examination completed</p>
+  ${
+    mock.review_mode === "immediate" || Number(mock.results_released) === 1
+      ? `<button
+          type="button"
+          class="primary review-paid-mock"
+          data-attempt-id="${escapeHtml(mock.attempt_id)}"
+          style="margin-top:12px;"
+        >Review Answers</button>`
+      : ""
+  }
+`
                 : `<button
                     type="button"
                     class="primary start-paid-mock"
