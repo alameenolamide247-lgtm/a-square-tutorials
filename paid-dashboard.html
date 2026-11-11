@@ -551,6 +551,8 @@ $("savedUniversity").textContent =
 
 $("profileSummary").hidden = false;
 $("profileForm").hidden = true;
+        $("editProfileButton").hidden = false;
+$("editProfileButton").textContent = "Edit Profile";
 
       } catch (error) {
         showMessage(error.message, "error");
