@@ -778,9 +778,13 @@ $("savedUniversity").textContent =
 
 if (profile.profileCompleted) {
   $("profileHeading").textContent = "Your Student Profile";
+  $("profileIntro").textContent =
+    "Manage your academic profile and update your learning preferences.";
   $("profileSummary").hidden = false;
   $("profileForm").hidden = true;
 } else {
+  $("profileIntro").textContent =
+    "Complete your academic profile so A² Tutorials can tailor your learning experience and track your progress.";
   $("profileSummary").hidden = true;
   $("profileForm").hidden = false;
 }
