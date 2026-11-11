@@ -696,6 +696,44 @@ CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_q
           highestScore: Number(result?.highest_score) || 0
         });
       }
+            // LOAD STUDENT PERFORMANCE PROGRESS
+      if (
+        url.pathname === "/api/paid/performance-progress" &&
+        method === "GET"
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({
+            error: "Your session is invalid or your access is inactive."
+          }, 401);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT
+            m.title,
+            m.scheduled_date,
+            a.submitted_at,
+            CASE
+              WHEN a.total_questions > 0
+              THEN (a.score * 400.0 / a.total_questions)
+              ELSE 0
+            END AS score_out_of_400
+          FROM paid_mock_attempts a
+          INNER JOIN paid_mocks m
+            ON m.id = a.mock_id
+          WHERE
+            a.student_id = ?
+            AND a.status IN ('submitted', 'expired')
+          ORDER BY
+            COALESCE(a.submitted_at, m.scheduled_date) ASC,
+            m.scheduled_date ASC
+        `).bind(student.id).all();
+
+        return json({
+          progress: result.results || []
+        });
+      }
             // START A PAID MOCK ATTEMPT
       if (
         url.pathname === "/api/paid/mocks/start" &&
