@@ -654,7 +654,48 @@ CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_q
           mocks: result.results || []
         });
       }
-      
+            // LOAD STUDENT PERFORMANCE SUMMARY
+      if (
+        url.pathname === "/api/paid/performance-summary" &&
+        method === "GET"
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({
+            error: "Your session is invalid or your access is inactive."
+          }, 401);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT
+            COUNT(*) AS completed_mocks,
+            AVG(
+              CASE
+                WHEN total_questions > 0
+                THEN (score * 100.0 / total_questions)
+                ELSE NULL
+              END
+            ) AS average_score,
+            MAX(
+              CASE
+                WHEN total_questions > 0
+                THEN (score * 100.0 / total_questions)
+                ELSE NULL
+              END
+            ) AS highest_score
+          FROM paid_mock_attempts
+          WHERE
+            student_id = ?
+            AND status IN ('submitted', 'expired')
+        `).bind(student.id).first();
+
+        return json({
+          completedMocks: Number(result?.completed_mocks) || 0,
+          averageScore: Number(result?.average_score) || 0,
+          highestScore: Number(result?.highest_score) || 0
+        });
+      }
             // START A PAID MOCK ATTEMPT
       if (
         url.pathname === "/api/paid/mocks/start" &&
