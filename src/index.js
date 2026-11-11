@@ -734,6 +734,63 @@ CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_q
           progress: result.results || []
         });
       }
+            // LOAD STUDENT WEAK-SUBJECT ANALYSIS
+      if (
+        url.pathname === "/api/paid/weak-subject-analysis" &&
+        method === "GET"
+      ) {
+        const student = await getPaidStudent(request, env);
+
+        if (!student) {
+          return json({
+            error: "Your session is invalid or your access is inactive."
+          }, 401);
+        }
+
+        const result = await env.DB.prepare(`
+          SELECT
+            s.subject_name,
+            COUNT(q.id) AS total_questions,
+            SUM(
+              CASE
+                WHEN ans.selected_option = q.correct_option
+                THEN 1
+                ELSE 0
+              END
+            ) AS correct_answers,
+            ROUND(
+              SUM(
+                CASE
+                  WHEN ans.selected_option = q.correct_option
+                  THEN 1
+                  ELSE 0
+                END
+              ) * 100.0 / COUNT(q.id),
+              1
+            ) AS accuracy
+          FROM paid_mock_attempts a
+          INNER JOIN paid_mock_questions q
+            ON q.mock_id = a.mock_id
+          INNER JOIN paid_mock_subjects s
+            ON s.id = q.subject_id
+          LEFT JOIN paid_mock_answers ans
+            ON ans.attempt_id = a.id
+            AND ans.question_id = q.id
+          WHERE
+            a.student_id = ?
+            AND a.status IN ('submitted', 'expired')
+          GROUP BY
+            s.id,
+            s.subject_name
+          ORDER BY
+            accuracy ASC,
+            s.subject_name ASC
+        `).bind(student.id).all();
+
+        return json({
+          subjects: result.results || []
+        });
+      }
             // START A PAID MOCK ATTEMPT
       if (
         url.pathname === "/api/paid/mocks/start" &&
