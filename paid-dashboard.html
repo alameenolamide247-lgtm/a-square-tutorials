@@ -1113,9 +1113,12 @@ $("goalMessage").textContent =
 
 $("studentHeader").hidden = false;
 
-        updateSubjectCount();
+        
+updateSubjectCount();
 await loadAnnouncements();
-        await loadPaidMocks();
+await loadPerformanceCalendar();
+await loadPaidMocks();
+        
         $("loading").hidden = true;
         $("profilePanel").hidden = false;
 
