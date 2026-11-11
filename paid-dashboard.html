@@ -533,6 +533,20 @@
         }
 
         showMessage("Your academic profile has been saved successfully.", "success");
+        $("savedSubjects").textContent =
+  ["Use of English", ...subjects].join(", ");
+
+$("savedDreamScore").textContent =
+  Number($("dreamScore").value);
+
+$("savedCourse").textContent =
+  $("aspiringCourse").value.trim();
+
+$("savedUniversity").textContent =
+  $("aspiringUniversity").value.trim();
+
+$("profileSummary").hidden = false;
+$("profileForm").hidden = true;
 
       } catch (error) {
         showMessage(error.message, "error");
