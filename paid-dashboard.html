@@ -345,10 +345,14 @@
   <p><strong>Aspiring Course:</strong> <span id="savedCourse"></span></p>
   <p><strong>Aspiring University:</strong> <span id="savedUniversity"></span></p>
 
-  <button type="button" class="primary" id="editProfileButton" style="margin-top:15px;">
-    Edit Profile
-  </button>
 </div>
+
+<button type="button" class="primary" id="editProfileButton"
+  style="margin-top:15px;" hidden>
+  Edit Profile
+</button>
+
+<form id="profileForm">
       <form id="profileForm">
         <label for="fullName">Full Name</label>
         <input id="fullName" type="text" readonly>
