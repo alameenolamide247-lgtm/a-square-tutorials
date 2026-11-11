@@ -772,7 +772,40 @@ async function loadAnnouncements() {
     $("announcementsPanel").hidden = false;
   }
 }
-    
+     async function loadPerformanceSummary() {
+      try {
+        const response = await fetch(
+          "/api/paid/performance-summary",
+          {
+            credentials: "same-origin",
+            cache: "no-store"
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Unable to load performance summary."
+          );
+        }
+
+        $("completedMocksCount").textContent =
+          result.completedMocks;
+
+        $("averageMockScore").textContent =
+          `${Number(result.averageScore).toFixed(1)}%`;
+
+        $("highestMockScore").textContent =
+          `${Number(result.highestScore).toFixed(1)}%`;
+
+      } catch (error) {
+        $("completedMocksCount").textContent = "—";
+        $("averageMockScore").textContent = "—";
+        $("highestMockScore").textContent = "—";
+        console.error("Performance summary:", error);
+      }
+     }   
     let calendarDate = new Date();
     let calendarMocks = [];
 
