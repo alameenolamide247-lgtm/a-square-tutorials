@@ -673,14 +673,14 @@ CASE WHEN m.results_released = 1 THEN a.total_questions ELSE NULL END AS total_q
             AVG(
               CASE
                 WHEN total_questions > 0
-                THEN (score * 100.0 / total_questions)
+                THEN (score * 400.0 / total_questions)
                 ELSE NULL
               END
             ) AS average_score,
             MAX(
               CASE
                 WHEN total_questions > 0
-                THEN (score * 100.0 / total_questions)
+                THEN (score * 400.0 / total_questions)
                 ELSE NULL
               END
             ) AS highest_score
