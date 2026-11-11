@@ -786,16 +786,37 @@ if (profile.profileCompleted) {
     "Manage your academic profile and update your learning preferences.";
   $("profileSummary").hidden = false;
   $("profileForm").hidden = true;
+  $("editProfileButton").hidden = false;
+  $("editProfileButton").textContent = "Edit Profile";
 } else {
   $("profileIntro").textContent =
     "Complete your academic profile so A² Tutorials can tailor your learning experience and track your progress.";
   $("profileSummary").hidden = true;
   $("profileForm").hidden = false;
+  $("editProfileButton").hidden = true;
 }
 
 $("editProfileButton").addEventListener("click", () => {
-  $("profileSummary").hidden = true;
-  $("profileForm").hidden = false;
+  if ($("profileForm").hidden) {
+    $("profileSummary").hidden = true;
+    $("profileForm").hidden = false;
+    $("editProfileButton").textContent = "Cancel Editing";
+  } else {
+    $("profileForm").hidden = true;
+    $("profileSummary").hidden = false;
+    $("editProfileButton").textContent = "Edit Profile";
+
+    $("dreamScore").value = $("savedDreamScore").textContent;
+    $("aspiringCourse").value = $("savedCourse").textContent;
+    $("aspiringUniversity").value = $("savedUniversity").textContent;
+
+    const savedSubjects = $("savedSubjects").textContent.split(", ");
+    document.querySelectorAll('input[name="subject"]').forEach(input => {
+      input.checked = savedSubjects.includes(input.value);
+    });
+
+    updateSubjectCount();
+  }
 });
 
         $("welcomeHeading").textContent =
