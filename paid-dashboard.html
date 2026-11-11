@@ -452,7 +452,25 @@
   <p class="muted">
     Track your daily mock examination progress.
   </p>
+  <div
+    id="performanceSummary"
+    style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:20px 0;"
+  >
+    <div style="background:#f0f6ff;padding:16px;border-radius:12px;">
+      <p class="muted">Mocks Completed</p>
+      <h2 id="completedMocksCount">—</h2>
+    </div>
 
+    <div style="background:#f0f6ff;padding:16px;border-radius:12px;">
+      <p class="muted">Average Score</p>
+      <h2 id="averageMockScore">—</h2>
+    </div>
+
+    <div style="background:#f0f6ff;padding:16px;border-radius:12px;">
+      <p class="muted">Highest Score</p>
+      <h2 id="highestMockScore">—</h2>
+    </div>
+  </div>
   <div class="calendar-header">
     <button type="button" id="previousMonth">Previous</button>
     <h3 id="calendarMonth">Loading...</h3>
