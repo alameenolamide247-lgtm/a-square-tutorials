@@ -960,6 +960,89 @@ async function loadAnnouncements() {
     chart.textContent = error.message;
     console.error("Performance progress:", error);
   }
+      
+async function loadWeakSubjectAnalysis() {
+  const container = $("weakSubjectAnalysis");
+
+  try {
+    const response = await fetch(
+      "/api/paid/weak-subject-analysis",
+      {
+        credentials: "same-origin",
+        cache: "no-store"
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.error || "Unable to load subject analysis."
+      );
+    }
+
+    const subjects = result.subjects || [];
+
+    if (subjects.length === 0) {
+      container.innerHTML = `
+        <p class="muted">
+          Complete a mock to see your subject analysis here.
+        </p>
+      `;
+      return;
+    }
+
+    container.innerHTML = subjects.map(subject => {
+      const total = Number(subject.total_questions) || 0;
+      const correct = Number(subject.correct_answers) || 0;
+      const accuracy = Math.max(
+        0,
+        Math.min(100, Number(subject.accuracy) || 0)
+      );
+
+      return `
+        <div style="margin-bottom:20px;">
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-bottom:7px;
+          ">
+            <strong>${escapeHtml(subject.subject_name)}</strong>
+
+            <span style="font-size:13px;">
+              ${correct}/${total} correct · ${accuracy.toFixed(1)}%
+            </span>
+          </div>
+
+          <div style="
+            width:100%;
+            height:10px;
+            background:#dce8f7;
+            border-radius:20px;
+            overflow:hidden;
+          ">
+            <div style="
+              width:${accuracy}%;
+              height:100%;
+              background:#2376e8;
+              border-radius:20px;
+            "></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+  } catch (error) {
+    container.textContent =
+      "Unable to load your subject analysis. Please refresh the page.";
+
+    console.error("Weak-subject analysis:", error);
+  }
+}
+      
     }
     let calendarDate = new Date();
     let calendarMocks = [];
