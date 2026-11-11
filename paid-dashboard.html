@@ -642,11 +642,12 @@ async function loadPaidMocks() {
   ${
     mock.review_mode === "immediate" || Number(mock.results_released) === 1
       ? `<button
-          type="button"
-          class="primary review-paid-mock"
-          data-attempt-id="${escapeHtml(mock.attempt_id)}"
-          style="margin-top:12px;"
-        >Review Answers</button>`
+  type="button"
+  class="primary review-paid-mock"
+  data-attempt-id="${escapeHtml(mock.attempt_id)}"
+  style="margin-top:12px;"
+  onclick="window.location.href='./paid-review.html?attempt=${encodeURIComponent(mock.attempt_id)}'"
+>Review Answers</button>`
       : ""
   }
 `
