@@ -754,6 +754,138 @@ async function loadAnnouncements() {
     $("announcementsPanel").hidden = false;
   }
 }
+    
+    let calendarDate = new Date();
+    let calendarMocks = [];
+
+    async function loadPerformanceCalendar() {
+      const panel = $("performancePanel");
+      const calendar = $("performanceCalendar");
+
+      try {
+        const response = await fetch(
+          "/api/paid/performance-calendar",
+          {
+            credentials: "same-origin",
+            cache: "no-store"
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Unable to load performance overview."
+          );
+        }
+
+        calendarMocks = result.mocks || [];
+        panel.hidden = false;
+        renderPerformanceCalendar();
+
+      } catch (error) {
+        calendar.textContent = error.message;
+        panel.hidden = false;
+      }
+    }
+
+    function renderPerformanceCalendar() {
+      const calendar = $("performanceCalendar");
+
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+
+      $("calendarMonth").textContent =
+        calendarDate.toLocaleDateString("en-GB", {
+          month: "long",
+          year: "numeric"
+        });
+
+      const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+      const firstDay = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const mondayOffset = (firstDay.getDay() + 6) % 7;
+
+      const mocksByDate = {};
+
+      calendarMocks.forEach(mock => {
+        const date = String(mock.scheduled_date || "").slice(0, 10);
+
+        if (!date) return;
+
+        if (!mocksByDate[date]) {
+          mocksByDate[date] = [];
+        }
+
+        mocksByDate[date].push(mock);
+      });
+
+      let html = weekdays.map(day =>
+        `<div class="calendar-weekday">${day}</div>`
+      ).join("");
+
+      for (let i = 0; i < mondayOffset; i++) {
+        html += '<div class="calendar-day empty"></div>';
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey =
+          `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        const dayMocks = mocksByDate[dateKey] || [];
+
+        let status = "no-mock";
+
+        if (dayMocks.length > 0) {
+          const allCompleted = dayMocks.every(mock =>
+            mock.attempt_status === "submitted" ||
+            mock.attempt_status === "expired"
+          );
+
+          status = allCompleted ? "completed" : "missed";
+        }
+
+        html += `
+          <div
+            class="calendar-day ${status}"
+            title="${
+              status === "completed"
+                ? "Mock completed"
+                : status === "missed"
+                  ? "Mock published but not completed"
+                  : "No mock published"
+            }"
+          >
+            ${day}
+          </div>
+        `;
+      }
+
+      calendar.innerHTML = html;
+    }
+
+    $("previousMonth").addEventListener("click", () => {
+      calendarDate = new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth() - 1,
+        1
+      );
+
+      renderPerformanceCalendar();
+    });
+
+    $("nextMonth").addEventListener("click", () => {
+      calendarDate = new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth() + 1,
+        1
+      );
+
+      renderPerformanceCalendar();
+    });
+    
 async function loadPaidMocks() {
   const container = $("paidMocksList");
   const panel = $("paidMocksPanel");
