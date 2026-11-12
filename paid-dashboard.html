@@ -882,10 +882,31 @@ async function loadAnnouncements() {
 
       const y = bottom - (score / 400) * (bottom - top);
 
-      const dateValue = item.submitted_at || item.scheduled_date;
-      const date = dateValue
-        ? new Date(dateValue).toLocaleDateString()
-        : "Date unavailable";
+      
+      let date = "Date unavailable";
+
+      if (item.submitted_at) {
+        const submittedAt = item.submitted_at.includes("T")
+          ? item.submitted_at
+          : item.submitted_at.replace(" ", "T") + "Z";
+
+        date = new Date(submittedAt).toLocaleDateString(
+          "en-GB",
+          { timeZone: "Africa/Lagos" }
+        );
+      } else if (item.scheduled_date) {
+        const [year, month, day] = item.scheduled_date
+          .split("-")
+          .map(Number);
+
+        date = new Date(
+          Date.UTC(year, month - 1, day, 12)
+        ).toLocaleDateString(
+          "en-GB",
+          { timeZone: "Africa/Lagos" }
+        );
+      }
+      
 
       return {
         x,
