@@ -1284,8 +1284,29 @@ function escapeHTML(value) {
 
 function formatDate(value) {
   if (!value) return "—";
-  const date = new Date(value);
-  return isNaN(date) ? value : date.toLocaleString();
+
+  const dateValue = String(value);
+  let date;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+    const [year, month, day] = dateValue.split("-").map(Number);
+    date = new Date(Date.UTC(year, month - 1, day, 12));
+  } else {
+    const normalisedDate = dateValue.includes("T")
+      ? dateValue
+      : dateValue.replace(" ", "T") + "Z";
+
+    date = new Date(normalisedDate);
+  }
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    timeZone: "Africa/Lagos"
+  });
 }
 
 let questionNumber = 0;
