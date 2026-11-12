@@ -784,7 +784,7 @@ async function loadPaidMocks() {
             ${d.mocks.map(m => `
               <tr>
                 <td>${escapeHTML(m.title)}</td>
-                <td>${escapeHTML(m.scheduled_date)}</td>
+                <td>${formatDate(m.scheduled_date)}</td>
                 <td>${m.duration_minutes} mins</td>
                 <td>${m.subject_count}</td>
                 <td>${m.question_count}</td>
