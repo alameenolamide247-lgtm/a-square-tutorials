@@ -1344,8 +1344,8 @@ async function loadPaidMocks() {
         }
 
         const date = mock.scheduled_date
-          ? new Date(mock.scheduled_date).toLocaleDateString()
-          : "Date to be announced";
+  ? formatDate(mock.scheduled_date)
+  : "Date to be announced";
 
                 return `
           <article style="padding:16px 0;border-bottom:1px solid #e0e9f5;">
