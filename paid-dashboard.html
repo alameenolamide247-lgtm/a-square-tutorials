@@ -1382,6 +1382,32 @@ async function loadPaidMocks() {
 >Review Answers</button>`
       : ""
   }
+    ${
+    Number(mock.results_released) === 1 &&
+    mock.score !== null &&
+    mock.score !== undefined
+      ? `
+        <button
+          type="button"
+          class="primary paid-result-download"
+          data-mock-id="${escapeHtml(mock.id)}"
+          data-attempt-id="${escapeHtml(mock.attempt_id)}"
+          data-student-name="${escapeHtml(mock.student_name)}"
+          data-mock-title="${escapeHtml(mock.title)}"
+          data-score="${Number(mock.score)}"
+          data-total="${Number(mock.total_questions) || 0}"
+          style="margin-top:12px;width:100%;"
+        >Download Result (PNG)</button>
+
+        <button
+          type="button"
+          class="primary paid-result-share hidden"
+          data-attempt-id="${escapeHtml(mock.attempt_id)}"
+          style="margin-top:10px;width:100%;"
+        >Share Result on WhatsApp</button>
+      `
+      : ""
+    }
 `
                 : `<button
                     type="button"
