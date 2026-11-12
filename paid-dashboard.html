@@ -818,7 +818,7 @@ async function loadAnnouncements() {
         <article style="padding:16px 0;border-bottom:1px solid #e0e9f5;">
           <h3 style="font-size:16px;margin-bottom:7px;">${escapeHtml(item.title)}</h3>
           <p style="font-size:14px;line-height:1.7;">${escapeHtml(item.message)}</p>
-          <small style="color:#71809b;">${new Date(item.created_at).toLocaleDateString()}</small>
+          <small style="color:#71809b;">${formatDate(item.created_at)}</small>
         </article>
       `).join("");
     }
