@@ -1015,7 +1015,7 @@ async function loadMocks() {
             ? `<button class="secondary" onclick="changeStatus('${m.id}','draft')">Unpublish</button>`
             : `<button class="primary" onclick="changeStatus('${m.id}','published')">Publish</button>`}
           <button class="secondary" onclick="changeStatus('${m.id}','archived')">Archive</button>
-          <button class="danger" onclick="deleteMock('${m.id}')">Delete</button>
+          <button type="button" class="danger" onclick="window.deleteFreeMock('${m.id}')">Delete</button>
         </td>
       </tr>
     `).join("") : `<tr><td colspan="6" class="empty">No mocks created yet.</td></tr>`;
