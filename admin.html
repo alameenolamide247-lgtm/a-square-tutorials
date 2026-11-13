@@ -800,6 +800,9 @@ async function loadPaidMocks() {
   <button class="primary" onclick="setPaidMockResults('${m.id}', ${m.results_released ? 0 : 1})">
     ${m.results_released ? "Hide Results" : "Release Results"}
   </button>
+  <button class="primary" onclick="deletePaidMock('${m.id}')">
+  Delete
+</button>
 </td>
 
               </tr>
@@ -855,6 +858,25 @@ async function setPaidMockStatus(mockId, status) {
 
   } catch (error) {
     alert(error.message);
+  }
+ }
+ async function deletePaidMock(mockId) {
+  const confirmed = confirm(
+    "Are you sure you want to delete this paid mock? Its past attempts, results, performance history and weak-subject records will be preserved."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await api(`/api/admin/paid-mocks/${encodeURIComponent(mockId)}`, {
+      method: "DELETE"
+    });
+
+    alert("Paid mock deleted successfully.");
+    await loadPaidMocks();
+
+  } catch (error) {
+    alert(error.message || "Unable to delete paid mock.");
   }
  }
  let selectedPaidMockId = "";
