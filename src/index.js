@@ -1892,7 +1892,8 @@ if (url.pathname === "/api/admin/paid-mocks" && method === "GET") {
       (SELECT COUNT(*) FROM paid_mock_questions q WHERE q.mock_id = m.id) AS question_count,
       (SELECT COUNT(*) FROM paid_mock_subjects s WHERE s.mock_id = m.id) AS subject_count
     FROM paid_mocks m
-    ORDER BY m.scheduled_date DESC, m.created_at DESC
+WHERE m.deleted_at IS NULL
+ORDER BY m.scheduled_date DESC, m.created_at DESC
   `).all();
 
   return json({ mocks: result.results || [] });
