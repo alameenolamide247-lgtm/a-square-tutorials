@@ -512,23 +512,70 @@
         </div>
       </section>
 
-      <section class="panel">
-        <div class="subject-label" id="subjectLabel">Subject</div>
-        <div class="question-number" id="questionNumber"></div>
-        <div class="question-text" id="questionText"></div>
-        <div class="options" id="options"></div>
+      
+      </section>
 
-        <div class="question-navigation">
-          <button class="nav-btn" id="previousButton" type="button">
-            Previous
-          </button>
+      <!-- JAMB-STYLE CALCULATOR -->
+      <button
+        type="button"
+        class="calculator-toggle"
+        id="calculatorToggle"
+        aria-controls="examCalculator"
+        aria-expanded="false"
+      >
+        Calculator
+      </button>
 
-          <button class="nav-btn" id="nextButton" type="button">
-            Next
+      <section class="calculator" id="examCalculator" hidden>
+        <div class="calculator-header">
+          <span>Basic Calculator</span>
+          <button
+            type="button"
+            class="calculator-close"
+            id="calculatorClose"
+          >
+            Close
           </button>
+        </div>
+
+        <input
+          type="text"
+          class="calculator-display"
+          id="calculatorDisplay"
+          value="0"
+          readonly
+          aria-label="Calculator display"
+        />
+
+        <div class="calculator-keys">
+          <button type="button" class="clear" data-calc="clear">C</button>
+          <button type="button" data-calc="delete">DEL</button>
+          <button type="button" class="operator" data-calc="/">÷</button>
+          <button type="button" class="operator" data-calc="*">×</button>
+
+          <button type="button" data-calc="7">7</button>
+          <button type="button" data-calc="8">8</button>
+          <button type="button" data-calc="9">9</button>
+          <button type="button" class="operator" data-calc="-">−</button>
+
+          <button type="button" data-calc="4">4</button>
+          <button type="button" data-calc="5">5</button>
+          <button type="button" data-calc="6">6</button>
+          <button type="button" class="operator" data-calc="+">+</button>
+
+          <button type="button" data-calc="1">1</button>
+          <button type="button" data-calc="2">2</button>
+          <button type="button" data-calc="3">3</button>
+          <button type="button" class="equals" data-calc="equals">=</button>
+
+          <button type="button" data-calc="0">0</button>
+          <button type="button" data-calc=".">.</button>
         </div>
       </section>
 
+      <section class="panel">
+        <div class="subject-label" id="subjectLabel">Subject</div>
+        
       <section class="panel">
         <h3>Question Navigator</h3>
         <p class="muted">
