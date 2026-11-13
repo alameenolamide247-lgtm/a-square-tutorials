@@ -1463,9 +1463,9 @@ if (Date.now() >= deadline) {
   env.DB.prepare("SELECT COUNT(*) AS count FROM students").first(),
   env.DB.prepare("SELECT COUNT(*) AS count FROM attempts").first(),
   env.DB.prepare("SELECT COUNT(*) AS count FROM access_codes WHERE is_active = 1 AND redeemed_at IS NULL").first(),
-  env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks").first(),
-  env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks WHERE status = 'published'").first(),
-  env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks WHERE status = 'draft'").first()
+  env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks WHERE deleted_at IS NULL").first(),
+env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks WHERE status = 'published' AND deleted_at IS NULL").first(),
+env.DB.prepare("SELECT COUNT(*) AS count FROM paid_mocks WHERE status = 'draft' AND deleted_at IS NULL").first()
 ]);
 
 return json({
