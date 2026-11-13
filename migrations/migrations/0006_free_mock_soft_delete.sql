@@ -1,0 +1,2 @@
+ALTER TABLE mocks
+ADD COLUMN deleted_at TEXT DEFAULT NULL;
