@@ -1736,8 +1736,9 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
         if (url.pathname === "/api/admin/paid-student-ids" && method === "GET") {
           const result = await env.DB.prepare(`
             SELECT
-              id,
-              is_active,
+  id,
+  code,
+  is_active,
               expires_at,
               created_at,
               redeemed_at,
