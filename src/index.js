@@ -1884,7 +1884,31 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
           return json({ ok: true });
         }
           // PAID MOCKS MANAGEMENT API
+if (
+  url.pathname.match(/^\/api\/admin\/paid-mocks\/[^/]+$/) &&
+  method === "DELETE"
+) {
+  const mockId = url.pathname.split("/")[4];
 
+  const mock = await env.DB.prepare(`
+    SELECT id
+    FROM paid_mocks
+    WHERE id = ? AND deleted_at IS NULL
+  `).bind(mockId).first();
+
+  if (!mock) {
+    return json({ error: "Paid mock not found." }, 404);
+  }
+
+  await env.DB.prepare(`
+    UPDATE paid_mocks
+    SET deleted_at = datetime('now')
+    WHERE id = ? AND deleted_at IS NULL
+  `).bind(mockId).run();
+
+  return json({ ok: true });
+}
+        
 if (url.pathname === "/api/admin/paid-mocks" && method === "GET") {
   const result = await env.DB.prepare(`
     SELECT
