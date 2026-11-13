@@ -1715,15 +1715,16 @@ ROUND((julianday(COALESCE(a.submitted_at, CURRENT_TIMESTAMP)) - julianday(a.star
             generated.push(code);
 
             statements.push(
-              env.DB.prepare(`
-                INSERT INTO paid_student_ids (id, code_hash, expires_at)
-                VALUES (?, ?, ?)
-              `).bind(
-                crypto.randomUUID(),
-                await sha256(code),
-                expiresAt
-              )
-            );
+  env.DB.prepare(`
+    INSERT INTO paid_student_ids (id, code_hash, code, expires_at)
+    VALUES (?, ?, ?, ?)
+  `).bind(
+    crypto.randomUUID(),
+    await sha256(code),
+    code,
+    expiresAt
+  )
+);
           }
 
           await env.DB.batch(statements);
