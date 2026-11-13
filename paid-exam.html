@@ -633,6 +633,163 @@
     const nextButton = document.getElementById("nextButton");
     const submitButton = document.getElementById("submitButton");
 
+    
+    // JAMB-STYLE BASIC CALCULATOR
+    const calculatorToggle = document.getElementById("calculatorToggle");
+    const calculatorPanel = document.getElementById("examCalculator");
+    const calculatorClose = document.getElementById("calculatorClose");
+    const calculatorDisplay = document.getElementById("calculatorDisplay");
+    const calculatorKeys = document.querySelector(".calculator-keys");
+
+    let calculatorValue = "0";
+    let calculatorStoredValue = null;
+    let calculatorOperator = null;
+    let calculatorWaitingForNumber = false;
+
+    function updateCalculatorDisplay() {
+      calculatorDisplay.value = calculatorValue;
+    }
+
+    function calculateResult() {
+      if (
+        calculatorStoredValue === null ||
+        calculatorOperator === null
+      ) {
+        return;
+      }
+
+      const first = calculatorStoredValue;
+      const second = Number(calculatorValue);
+      let result;
+
+      switch (calculatorOperator) {
+        case "+":
+          result = first + second;
+          break;
+        case "-":
+          result = first - second;
+          break;
+        case "*":
+          result = first * second;
+          break;
+        case "/":
+          if (second === 0) {
+            calculatorValue = "Cannot divide by 0";
+            calculatorStoredValue = null;
+            calculatorOperator = null;
+            calculatorWaitingForNumber = true;
+            updateCalculatorDisplay();
+            return;
+          }
+          result = first / second;
+          break;
+      }
+
+      calculatorValue = String(
+        Number(result.toPrecision(10))
+      );
+
+      calculatorStoredValue = null;
+      calculatorOperator = null;
+      calculatorWaitingForNumber = true;
+      updateCalculatorDisplay();
+    }
+
+    calculatorToggle.addEventListener("click", () => {
+      calculatorPanel.hidden = false;
+      calculatorToggle.setAttribute("aria-expanded", "true");
+    });
+
+    calculatorClose.addEventListener("click", () => {
+      calculatorPanel.hidden = true;
+      calculatorToggle.setAttribute("aria-expanded", "false");
+    });
+
+    calculatorKeys.addEventListener("click", event => {
+      const button = event.target.closest("button[data-calc]");
+
+      if (!button) return;
+
+      const action = button.dataset.calc;
+
+      if (action === "clear") {
+        calculatorValue = "0";
+        calculatorStoredValue = null;
+        calculatorOperator = null;
+        calculatorWaitingForNumber = false;
+        updateCalculatorDisplay();
+        return;
+      }
+
+      if (action === "delete") {
+        if (calculatorWaitingForNumber) {
+          calculatorValue = "0";
+          calculatorWaitingForNumber = false;
+        } else {
+          calculatorValue =
+            calculatorValue.length > 1
+              ? calculatorValue.slice(0, -1)
+              : "0";
+
+          if (calculatorValue === "-") {
+            calculatorValue = "0";
+          }
+        }
+
+        updateCalculatorDisplay();
+        return;
+      }
+
+      if (action === "equals") {
+        calculateResult();
+        return;
+      }
+
+      if (["+", "-", "*", "/"].includes(action)) {
+        if (calculatorValue === "Cannot divide by 0") return;
+
+        if (
+          calculatorOperator !== null &&
+          !calculatorWaitingForNumber
+        ) {
+          calculateResult();
+        }
+
+        calculatorStoredValue = Number(calculatorValue);
+        calculatorOperator = action;
+        calculatorWaitingForNumber = true;
+        return;
+      }
+
+      if (action === ".") {
+        if (calculatorWaitingForNumber) {
+          calculatorValue = "0.";
+          calculatorWaitingForNumber = false;
+        } else if (!calculatorValue.includes(".")) {
+          calculatorValue += ".";
+        }
+
+        updateCalculatorDisplay();
+        return;
+      }
+
+      if (/^\d$/.test(action)) {
+        if (calculatorWaitingForNumber) {
+          calculatorValue = action;
+          calculatorWaitingForNumber = false;
+        } else if (
+          calculatorValue === "0" ||
+          calculatorValue === "Cannot divide by 0"
+        ) {
+          calculatorValue = action;
+        } else {
+          calculatorValue += action;
+        }
+
+        updateCalculatorDisplay();
+      }
+    });
+    
     let questions = [];
     let answers = {};
     let currentQuestion = 0;
