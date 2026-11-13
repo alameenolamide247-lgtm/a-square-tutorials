@@ -1459,7 +1459,7 @@ if (Date.now() >= deadline) {
         // Dashboard statistics
         if (url.pathname === "/api/admin/overview" && method === "GET") {
           const [mocks, students, attempts, codes, paidMocks, paidPublished, paidDrafts] = await Promise.all([
-  env.DB.prepare("SELECT COUNT(*) AS count FROM mocks").first(),
+  env.DB.prepare("SELECT COUNT(*) AS count FROM mocks WHERE deleted_at IS NULL").first(),
   env.DB.prepare("SELECT COUNT(*) AS count FROM students").first(),
   env.DB.prepare("SELECT COUNT(*) AS count FROM attempts").first(),
   env.DB.prepare("SELECT COUNT(*) AS count FROM access_codes WHERE is_active = 1 AND redeemed_at IS NULL").first(),
@@ -1601,7 +1601,24 @@ ORDER BY m.created_at DESC
               : "Mock saved as draft."
           }, 201);
         }
+// Soft-delete a free mock while preserving its history
+const deleteMockMatch = url.pathname.match(
+  /^\/api\/admin\/mocks\/([^/]+)$/
+);
 
+if (deleteMockMatch && method === "DELETE") {
+  const result = await env.DB.prepare(`
+    UPDATE mocks
+    SET deleted_at = datetime('now')
+    WHERE id = ? AND deleted_at IS NULL
+  `).bind(deleteMockMatch[1]).run();
+
+  if (!result.meta?.changes) {
+    return json({ error: "Mock not found or already deleted." }, 404);
+  }
+
+  return json({ ok: true });
+}
         // Change mock status
         const statusMatch = url.pathname.match(
           /^\/api\/admin\/mocks\/([^/]+)\/status$/
