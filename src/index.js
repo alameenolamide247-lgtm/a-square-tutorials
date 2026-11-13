@@ -2772,7 +2772,8 @@ if (examReviewMatch && method === "GET") {
             )
             AND EXISTS (
               SELECT 1 FROM mocks
-              WHERE id = ? AND status = 'published'
+WHERE id = ? AND status = 'published'
+  AND deleted_at IS NULL
             )
           `).bind(
             studentId,
@@ -2796,7 +2797,8 @@ if (examReviewMatch && method === "GET") {
               )
               AND EXISTS (
                 SELECT 1 FROM mocks
-                WHERE id = ? AND status = 'published'
+WHERE id = ? AND status = 'published'
+  AND deleted_at IS NULL
               )
           `).bind(
             now,
