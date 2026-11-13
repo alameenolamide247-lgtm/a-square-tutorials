@@ -1485,7 +1485,8 @@ return json({
             SELECT m.*,
               (SELECT COUNT(*) FROM questions q WHERE q.mock_id = m.id) AS saved_questions
             FROM mocks m
-            ORDER BY m.created_at DESC
+WHERE m.deleted_at IS NULL
+ORDER BY m.created_at DESC
           `).all();
 
           return json({
@@ -2667,8 +2668,9 @@ if (examReviewMatch && method === "GET") {
         const result = await env.DB.prepare(`
           SELECT id, title, subjects_json, duration_minutes, question_count
           FROM mocks
-          WHERE status = 'published'
-            AND (available_from IS NULL OR available_from <= datetime('now'))
+        WHERE status = 'published'
+  AND deleted_at IS NULL
+  AND (available_from IS NULL OR available_from <= datetime('now'))
             AND (available_until IS NULL OR available_until >= datetime('now'))
           ORDER BY created_at DESC
         `).all();
