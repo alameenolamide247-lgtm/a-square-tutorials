@@ -2740,13 +2740,13 @@ if (examReviewMatch && method === "GET") {
         }
 
         const mock = await env.DB.prepare(`
-          SELECT id FROM mocks
-          WHERE id = ?
-            AND status = 'published'
-            AND (available_from IS NULL OR available_from <= datetime('now'))
-            AND (available_until IS NULL OR available_until >= datetime('now'))
-        `).bind(mockId).first();
-
+  SELECT id FROM mocks
+  WHERE id = ?
+    AND status = 'published'
+    AND deleted_at IS NULL
+    AND (available_from IS NULL OR available_from <= datetime('now'))
+    AND (available_until IS NULL OR available_until >= datetime('now'))
+`).bind(mockId).first();
         if (!mock) {
           return json({
             error: "This mock is not currently available."
