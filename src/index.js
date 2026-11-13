@@ -614,6 +614,7 @@ if (
     ON a.mock_id = m.id
     AND a.student_id = ?
   WHERE m.status = 'published'
+  AND m.deleted_at IS NULL
   ORDER BY m.scheduled_date ASC
 `).bind(student.full_name, student.id).all();
 
@@ -921,8 +922,9 @@ if (
              WHERE mock_id = paid_mocks.id) AS question_count
           FROM paid_mocks
           WHERE id = ?
-            AND status = 'published'
-          LIMIT 1
+  AND status = 'published'
+  AND deleted_at IS NULL
+LIMIT 1
         `).bind(mockId).first();
 
         if (!mock) {
