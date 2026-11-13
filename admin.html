@@ -1451,7 +1451,7 @@ async function loadPaidIds() {
 
           return `
             <tr>
-              <td>${escapeHTML(item.id)}</td>
+              <td>${escapeHTML(item.code || "Previously generated ID")}</td>
               <td>${active ? "Active" : expired ? "Expired" : "Inactive"}</td>
               <td>${escapeHTML(item.expires_at || "No expiry")}</td>
               <td>${escapeHTML(item.redeemed_by_email || "Not registered")}</td>
